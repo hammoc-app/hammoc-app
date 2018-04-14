@@ -23,4 +23,10 @@ defmodule HammocWeb.Router do
   # scope "/api", HammocWeb do
   #   pipe_through :api
   # end
+
+  forward "/graphql", Absinthe.Plug,
+    schema: HammocWeb.Schema
+
+  forward "/graphiql", Absinthe.Plug.GraphiQL,
+    schema: HammocWeb.Schema
 end

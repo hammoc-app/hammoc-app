@@ -52,7 +52,15 @@ defmodule Hammoc.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+
+      # absinthe graphql
+      # ================
+      {:absinthe, "~> 1.4.0"},
+      {:absinthe_plug, "~> 1.4.0"},
+      {:absinthe_ecto, "~> 0.1.0"},
+      {:absinthe_phoenix, "~> 1.4.0"},
+      {:absinthe_relay, "~> 1.4.0"}
     ]
   end
 
