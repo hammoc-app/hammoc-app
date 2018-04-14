@@ -4,12 +4,10 @@ defmodule Hammoc.Scraper.Url do
   alias Hammoc.Scraper.Url
 
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  @primary_key {:url, :string, autogenerate: false}
+  @foreign_key_type :string
   schema "urls" do
-    field :url, :string
-
-    belongs_to :link, Hammoc.Scraper.Link
+    belongs_to :link, Hammoc.Scraper.Link, type: Ecto.UUID
   end
 
   @doc false

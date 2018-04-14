@@ -39,8 +39,10 @@ defmodule Hammoc.Mixfile do
       #  -> https://github.com/jumpn/postgrex
       #  -> https://github.com/jumpn/ecto_replay_sandbox
       #  -> https://gist.github.com/cohawk/df29c1c54abd858dd19d8327e862822a
+      {:ecto, "~> 2.1", github: "arnodirlam/ecto", tag: "v2.2.10_cdb", override: true},
       {:postgrex, "~> 0.13", hex: :postgrex_cdb, override: true},
       {:ecto_replay_sandbox, "~> 1.0", only: :test},
+      {:uuid, "~> 1.1.0"},
 
       # phoenix
       # =======

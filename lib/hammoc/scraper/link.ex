@@ -4,8 +4,8 @@ defmodule Hammoc.Scraper.Link do
   alias Hammoc.Scraper.Link
 
 
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @foreign_key_type Ecto.UUID
   schema "links" do
     field :excerpt, :string
     field :html, :string
