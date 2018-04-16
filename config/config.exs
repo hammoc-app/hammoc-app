@@ -23,6 +23,10 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+# Parse .pug template files using expug
+#   -> https://hexdocs.pm/expug/syntax.html
+config :phoenix, :template_engines, pug: PhoenixExpug.Engine
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

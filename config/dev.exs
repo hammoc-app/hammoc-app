@@ -37,7 +37,7 @@ config :hammoc, HammocWeb.Endpoint,
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
       ~r{lib/hammoc_web/views/.*(ex)$},
-      ~r{lib/hammoc_web/templates/.*(eex)$}
+      ~r{lib/hammoc_web/templates/.*(eex|pug)$}
     ]
   ]
 
