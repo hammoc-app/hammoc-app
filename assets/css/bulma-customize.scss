@@ -1,0 +1,42 @@
+@charset "utf-8";
+/*! bulma.io v0.7.0 | MIT License | github.com/jgthms/bulma */
+
+// UI framework: Bulma
+//   -> https://bulma.io/
+//   -> https://bulma.io/documentation/overview/variables/
+//   -> https://gentlelionstudios.com/blog/how-i-use-bulma-with-the-phoenix-framework
+
+// Bulma Init
+// ==========
+@import "../node_modules/bulma/sass/utilities/initial-variables";
+@import "../node_modules/bulma/sass/utilities/functions";
+
+
+// Bulma Variable Overrides
+// ========================
+
+// Colors
+//   -> https://bulma.io/documentation/overview/colors/
+$primary: $orange;
+
+
+// Bulma Includes
+// ==============
+@import "../node_modules/bulma/sass/utilities/_all";
+@import "../node_modules/bulma/sass/base/_all";
+@import "../node_modules/bulma/sass/elements/container";
+@import "../node_modules/bulma/sass/elements/content";
+@import "../node_modules/bulma/sass/elements/notification";
+@import "../node_modules/bulma/sass/elements/title";
+@import "../node_modules/bulma/sass/components/card";
+@import "../node_modules/bulma/sass/components/navbar";
+@import "../node_modules/bulma/sass/grid/_all";
+@import "../node_modules/bulma/sass/layout/_all";
+
+
+// Additional Modifiers
+// ====================
+.card.has-shadow {
+  box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1),
+              0 5px 15px rgba(0, 0, 0, 0.07);
+}

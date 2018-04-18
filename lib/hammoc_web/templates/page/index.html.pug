@@ -1,24 +1,33 @@
-.jumbotron
-  h2= gettext "Welcome to %{name}!", name: "Phoenix"
-  p.lead A productive web framework that<br />does not compromise speed and maintainability.
+.hero.is-primary.is-bold
+  .hero-body
+    .container
+      .title= gettext "Welcome to %{name}!", name: "Phoenix"
+      .subtitle A productive web framework that<br />does not compromise speed and maintainability.
 
-.row.marketing
-  .col-lg-6
-    h4 Resources
-    ul
-      li
-        a(href="http://phoenixframework.org/docs/overview") Guides
-      li
-        a(href="https://hexdocs.pm/phoenix") Docs
-      li
-        a(href="https://github.com/phoenixframework/phoenix") Source
+.section
+  .columns
+    .column.is-5.is-offset-1
+      .card.has-shadow.is-rounded
+        .card-content
+          .content
+            h4 Resources
+            ul
+              li
+                a(href="http://phoenixframework.org/docs/overview") Guides
+              li
+                a(href="https://hexdocs.pm/phoenix") Docs
+              li
+                a(href="https://github.com/phoenixframework/phoenix") Source
 
-  .col-lg-6
-    h4 Help
-    ul
-      li
-        a(href="http://groups.google.com/group/phoenix-talk") Mailing list
-      li
-        a(href="http://webchat.freenode.net/?channels=elixir-lang") #elixir-lang on freenode IRC
-      li
-        a(href="https://twitter.com/elixirphoenix") @elixirphoenix
+    .column.is-5
+      .card.has-shadow.is-rounded
+        .card-content
+          .content
+            h4 Help
+            ul
+              li
+                a(href="http://groups.google.com/group/phoenix-talk") Mailing list
+              li
+                a(href="http://webchat.freenode.net/?channels=elixir-lang") #elixir-lang on freenode IRC
+              li
+                a(href="https://twitter.com/elixirphoenix") @elixirphoenix
