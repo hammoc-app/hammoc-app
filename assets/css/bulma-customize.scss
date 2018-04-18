@@ -19,6 +19,11 @@
 //   -> https://bulma.io/documentation/overview/colors/
 $primary: $orange;
 
+// Font: Inter UI
+@import "inter-ui";
+$family-sans-serif: "Inter UI", $family-sans-serif;
+$family-primary: $family-sans-serif;
+
 
 // Bulma Includes
 // ==============
