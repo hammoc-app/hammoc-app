@@ -53,7 +53,15 @@ defmodule Hammoc.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
       {:phoenix_expug, "~> 0.1.0"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+
+      # APIs
+      # ========
+      {:extwitter, "~> 0.9"},
+
+      # Utilities for data
+      # ==================
+      {:gen_stage, "~> 0.14"}
     ]
   end
 
