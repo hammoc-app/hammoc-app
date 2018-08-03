@@ -14,6 +14,8 @@ defmodule Hammoc.Application do
       supervisor(HammocWeb.Endpoint, []),
       # Start your own worker by calling: Hammoc.Worker.start_link(arg1, arg2, arg3)
       # worker(Hammoc.Worker, [arg1, arg2, arg3]),
+      worker(Hammoc.Scraper.Twitter.Loader, ["HillaryClinton"]),
+      worker(Hammoc.Scraper.Twitter.Collector, [], id: 1),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
