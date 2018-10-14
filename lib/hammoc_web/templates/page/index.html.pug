@@ -1,33 +1,62 @@
 .hero.is-primary.is-bold
   .hero-body
     .container
-      .title= gettext "Welcome to %{name}!", name: "Phoenix"
-      .subtitle A productive web framework that<br />does not compromise speed and maintainability.
+      .title Your digital memory
+      .subtitle Everything you bookmarked, liked or shared at one place.
 
 .section
-  .columns
-    .column.is-5.is-offset-1
-      .card.has-shadow.is-rounded
-        .card-content
-          .content
-            h4 Resources
-            ul
-              li
-                a(href="http://phoenixframework.org/docs/overview") Guides
-              li
-                a(href="https://hexdocs.pm/phoenix") Docs
-              li
-                a(href="https://github.com/phoenixframework/phoenix") Source
+  .container
+    .columns
+      .column
+        .card.has-shadow.is-rounded(style="height: 115%")
+          .card-content.has-text-centered
+            .title All your links, at one place
+            hr
+            | Get an overview of all items you liked or saved
+            | anywhere. Filter and search among them by any aspect, including
+            | title, content, who posted them, or how you got them.
 
-    .column.is-5
-      .card.has-shadow.is-rounded
-        .card-content
-          .content
-            h4 Help
-            ul
-              li
-                a(href="http://groups.google.com/group/phoenix-talk") Mailing list
-              li
-                a(href="http://webchat.freenode.net/?channels=elixir-lang") #elixir-lang on freenode IRC
-              li
-                a(href="https://twitter.com/elixirphoenix") @elixirphoenix
+      .column
+        .card.has-shadow.is-rounded(style="height: 110%")
+          .card-content.has-text-centered
+            .title Organize & Discover
+            hr
+            | Hammoc assumes that you find more interesting stuff than
+            | you can digest at a time, scattered across many places.
+            | It helps you keep an overview and prioritize so you can use
+            | your time in a more meaningful way.
+
+      .column
+        .card.has-shadow.is-rounded(style="height: 105%")
+          .card-content.has-text-centered
+            .title Keep your habits
+            hr
+            | Hammoc connects to the channels you already use,
+            | so you don't have to change anything.
+
+      .column
+        .card.has-shadow.is-rounded(style="height: 100%")
+          .card-content.has-text-centered
+            .title Open & Secure
+            hr
+            | Hammoc is an open-source project with a focus on data privacy.
+            | Everyone can customize, extend and run it on own servers.
+            | Hammoc.io is just one instance, professionally hosted in Europe.
+
+.section
+  .container.has-text-centered
+      .title Supported channels
+      .columns.is-centered
+        .column.is-10.is-8-fullhd
+          .columns.is-mobile
+            = for name <- ["instagram", "facebook", "twitter", "linkedin", "youtube", "pinterest", "medium", "mozilla", "safari", "chrome"] do
+              .column
+                img(src="/images/platforms/#{name}.svg" width="56" height="56")
+
+.hero.is-primary
+  .hero-body
+    .container.has-text-centered
+      .title Open up your Hammoc
+      .button.has-text-weight-bold
+        a(href="https://hammoc.typeform.com/to/Nd5w3R" target="_blank") I'm interested!
+

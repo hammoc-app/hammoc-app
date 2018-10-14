@@ -17,6 +17,9 @@
 
 // Colors
 //   -> https://bulma.io/documentation/overview/colors/
+$orange: #EC5739;
+$green: #1FB56F;
+$yellow: #F9CB31;
 $primary: $orange;
 
 // Font: Inter UI
@@ -29,11 +32,13 @@ $family-primary: $family-sans-serif;
 // ==============
 @import "../node_modules/bulma/sass/utilities/_all";
 @import "../node_modules/bulma/sass/base/_all";
+@import "../node_modules/bulma/sass/elements/button";
 @import "../node_modules/bulma/sass/elements/container";
 @import "../node_modules/bulma/sass/elements/content";
 @import "../node_modules/bulma/sass/elements/notification";
 @import "../node_modules/bulma/sass/elements/title";
 @import "../node_modules/bulma/sass/components/card";
+@import "../node_modules/bulma/sass/components/level";
 @import "../node_modules/bulma/sass/components/navbar";
 @import "../node_modules/bulma/sass/grid/_all";
 @import "../node_modules/bulma/sass/layout/_all";

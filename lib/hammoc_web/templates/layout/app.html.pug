@@ -14,12 +14,8 @@ html(lang="en")
     nav.navbar.is-light(role="navigation" aria-label="main navigation")
       .container
         .navbar-brand
-          .navbar-item
-            img.logo(src="/images/phoenix.png")
-        .navbar-menu
-          .navbar-end
-            .navbar-item
-              a(href="http://www.phoenixframework.org/docs") Get Started
+          .logo-container
+            img(src="/images/hammoc.svg" width="247" height="49")
 
     - info = get_flash(@conn, :info)
     - error = get_flash(@conn, :error)
