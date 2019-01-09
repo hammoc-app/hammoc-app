@@ -10,10 +10,11 @@ config :hammoc, HammocWeb.Endpoint,
 config :logger, level: :warn
 
 # Configure your database
+#   -> https://gist.github.com/cohawk/df29c1c54abd858dd19d8327e862822a
 config :hammoc, Hammoc.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  port: 26257,
+  username: "root",
   database: "hammoc_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool: EctoReplaySandbox

@@ -1,4 +1,4 @@
 ExUnit.start()
 
-Ecto.Adapters.SQL.Sandbox.mode(Hammoc.Repo, :manual)
-
+sandbox = Application.get_env(:hammoc, Hammoc.Repo)[:pool]
+sandbox.mode(Hammoc.Repo, :manual)

@@ -26,10 +26,11 @@ defmodule Hammoc.DataCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Hammoc.Repo)
+    sandbox = Application.get_env(:hammoc, Hammoc.Repo)[:pool]
+    :ok = sandbox.checkout(Hammoc.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Hammoc.Repo, {:shared, self()})
+      sandbox.mode(Hammoc.Repo, {:shared, self()})
     end
 
     :ok
