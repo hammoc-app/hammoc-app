@@ -1,5 +1,5 @@
 defmodule Hammoc.ScraperTest do
-  use Hammoc.DataCase
+  use Hammoc.DataCase, async: true
 
   alias Hammoc.Scraper
 
