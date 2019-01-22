@@ -33,10 +33,21 @@ defmodule Hammoc.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # database
+      # ========
+      # workarounds for CockroachDB
+      #  -> https://github.com/jumpn/postgrex
+      #  -> https://github.com/jumpn/ecto_replay_sandbox
+      #  -> https://gist.github.com/cohawk/df29c1c54abd858dd19d8327e862822a
+      {:postgrex, "~> 0.13", hex: :postgrex_cdb, override: true},
+      {:ecto_replay_sandbox, "~> 1.0", only: :test},
+      {:uuid, "~> 1.1.0"},
+
+      # phoenix
+      # =======
       {:phoenix, "~> 1.3.0"},
       {:phoenix_pubsub, "~> 1.0"},
       {:phoenix_ecto, "~> 3.2"},
-      {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:gettext, "~> 0.11"},
