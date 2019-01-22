@@ -6,10 +6,7 @@ env:
   - COCKROACHDB_VERSION=2.1.3
 
 before_install:
-  - curl https://binaries.cockroachdb.com/cockroach-v${COCKROACHDB_VERSION}.linux-amd64.tgz | tar -xz && cockroach-v${COCKROACHDB_VERSION}.linux-amd64/cockroach start --insecure --background
-
-before_script:
-  - sleep 10
+  - curl https://binaries.cockroachdb.com/cockroach-v${COCKROACHDB_VERSION}.linux-amd64.tgz | tar -xz && cockroach-v${COCKROACHDB_VERSION}.linux-amd64/cockroach start --insecure --listen-addr=localhost --background
 
 cache:
   directories:
