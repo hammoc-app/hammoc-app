@@ -1,5 +1,5 @@
 defmodule HammocWeb.PageControllerTest do
-  use HammocWeb.ConnCase, async: true
+  use HammocWeb.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get conn, "/"
