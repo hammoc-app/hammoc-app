@@ -17,4 +17,5 @@ config :hammoc, Hammoc.Repo,
   username: "root",
   database: "hammoc_test",
   hostname: "localhost",
-  pool: EctoReplaySandbox
+  pool: EctoReplaySandbox,
+  pool_size: 20
