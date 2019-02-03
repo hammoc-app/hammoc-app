@@ -1,0 +1,8 @@
+hammoc:
+  build:
+    dockerfile: Dockerfile
+  links:
+    - cockroachdb
+
+cockroachdb:
+  image: cockroachdb/cockroach:v2.1.3

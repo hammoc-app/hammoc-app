@@ -1,0 +1,9 @@
+- name: CI Build
+  type: serial
+  steps:
+    - name: Compile
+      service: hammoc
+      command: mix compile
+    - name: Test
+      service: hammoc
+      command: mix test
