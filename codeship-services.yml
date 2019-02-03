@@ -1,11 +1,11 @@
 hammoc:
   build:
     dockerfile: Dockerfile
-  links:
+  depends_on:
     - cockroachdb
+  environment:
+    DB_HOST: cockroachdb
 
 cockroachdb:
   image: cockroachdb/cockroach:v2.1.3
   command: start --insecure
-  expose:
-    - 26257

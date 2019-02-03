@@ -9,6 +9,18 @@ use Mix.Config
 config :hammoc,
   ecto_repos: [Hammoc.Repo]
 
+# Configure your database
+#
+# WARNING!
+# Environment variables used here are read at compile time.
+#
+config :hammoc, Hammoc.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  port: System.get_env("DB_PORT") || "26257",
+  username: System.get_env("DB_USER") || "root",
+  password: System.get_env("DB_PASSWORD"),
+  hostname: System.get_env("DB_HOST") || "localhost"
+
 # Configures the endpoint
 config :hammoc, HammocWeb.Endpoint,
   url: [host: "localhost"],
