@@ -6,4 +6,6 @@ hammoc:
 
 cockroachdb:
   image: cockroachdb/cockroach:v2.1.3
-  command: start --insecure --listen-addr=localhost
+  command: start --insecure
+  expose:
+    - 26257
