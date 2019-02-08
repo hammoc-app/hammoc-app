@@ -1,21 +1,21 @@
 defmodule Hammoc.Application do
-  use Application
-
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
-  def start(_type, _args) do
-    import Supervisor.Spec
+  @moduledoc false
 
-    # Define workers and child supervisors to be supervised
+  use Application
+
+  def start(_type, _args) do
+    # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      supervisor(Hammoc.Repo, []),
+      Hammoc.Repo,
       # Start the endpoint when the application starts
-      supervisor(HammocWeb.Endpoint, []),
-      # Start your own worker by calling: Hammoc.Worker.start_link(arg1, arg2, arg3)
-      # worker(Hammoc.Worker, [arg1, arg2, arg3]),
-      worker(Hammoc.Scraper.Twitter.Loader, ["HillaryClinton"]),
-      worker(Hammoc.Scraper.Twitter.Collector, [], id: 1),
+      HammocWeb.Endpoint,
+      # Starts a worker by calling: Hammoc.Worker.start_link(arg)
+      # {Hammoc.Worker, arg},
+      {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
+      Hammoc.Scraper.Twitter.Collector
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

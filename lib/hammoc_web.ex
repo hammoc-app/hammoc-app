@@ -20,26 +20,28 @@ defmodule HammocWeb do
   def controller do
     quote do
       use Phoenix.Controller, namespace: HammocWeb
+
       import Plug.Conn
-      import HammocWeb.Router.Helpers
       import HammocWeb.Gettext
+      alias HammocWeb.Router.Helpers, as: Routes
     end
   end
 
   def view do
     quote do
-      use Phoenix.View, root: "lib/hammoc_web/templates",
-                        namespace: HammocWeb
+      use Phoenix.View,
+        root: "lib/hammoc_web/templates",
+        namespace: HammocWeb
 
       # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
+      import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
 
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      import HammocWeb.Router.Helpers
       import HammocWeb.ErrorHelpers
       import HammocWeb.Gettext
+      alias HammocWeb.Router.Helpers, as: Routes
     end
   end
 

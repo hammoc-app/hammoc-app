@@ -1,7 +1,7 @@
 defmodule Hammoc.Scraper.Twitter.Collector do
 	use GenStage
 
-	def start_link do
+	def start_link(_arg) do
 		GenStage.start_link(__MODULE__, nil)
 	end
 
