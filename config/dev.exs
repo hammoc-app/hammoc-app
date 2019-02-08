@@ -49,11 +49,10 @@ config :logger, :console, format: "[$level] $message\n"
 config :phoenix, :stacktrace_depth, 20
 
 # Configure your database
-#   -> https://gist.github.com/cohawk/df29c1c54abd858dd19d8327e862822a
 config :hammoc, Hammoc.Repo,
   adapter: Ecto.Adapters.Postgres,
-  port: 26257,
-  username: "root",
+  username: "postgres",
+  password: "postgres",
   database: "hammoc_dev",
   hostname: "localhost",
   pool_size: 10

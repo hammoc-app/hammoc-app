@@ -7,8 +7,7 @@ use Mix.Config
 
 # General application configuration
 config :hammoc,
-  ecto_repos: [Hammoc.Repo],
-  generators: [binary_id: true]
+  ecto_repos: [Hammoc.Repo]
 
 # Configures the endpoint
 config :hammoc, HammocWeb.Endpoint,
