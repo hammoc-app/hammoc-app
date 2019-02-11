@@ -12,9 +12,8 @@ defmodule Hammoc.Scraper.Twitter.Collector do
   end
 
   def handle_events(tweets, _from, state) do
-    new_tweets =
-      tweets
-      |> Enum.each(fn tweet -> IO.puts("$#{tweet.id_str} #{tweet.created_at} #{tweet.text}") end)
+    tweets
+    |> Enum.each(fn tweet -> IO.puts("$#{tweet.id_str} #{tweet.created_at} #{tweet.text}") end)
 
     :timer.sleep(10_000)
 

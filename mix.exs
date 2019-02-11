@@ -10,7 +10,11 @@ defmodule Hammoc.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:expug],
+        flags: [:unmatched_returns, :error_handling, :race_conditions, :no_opaque]
+      ]
     ]
   end
 
@@ -55,7 +59,8 @@ defmodule Hammoc.MixProject do
 
       # dev & test
       # ==========
-      {:credo, "~> 1.0"}
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false}
     ]
   end
 
