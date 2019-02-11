@@ -3,13 +3,19 @@ elixir: '1.8.0'
 otp_release: '21.1.1'
 
 before_install:
-  - service postgresql stop || true
-  - docker run -d --name postgres11 -p 5432:5432 postgres:11.1
+  - docker run -d --name postgres11 -p 5433:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
   - docker exec -i postgres11 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
+
+env:
+  - DB_PORT=5433
 
 jobs:
   include:
     - stage: compile
+      script: mix compile
+    - stage: compile
+      script: MIX_ENV=test mix compile
+    - stage: test
       script: mix compile
     - stage: test
       script: mix credo
@@ -17,6 +23,8 @@ jobs:
       script: mix format --check-formatted --dry-run
     - stage: test
       script: mix dialyzer --halt-exit-status
+    - stage: test
+      script: MIX_ENV=test mix dialyzer --halt-exit-status
     - stage: test
       script: mix test
 
