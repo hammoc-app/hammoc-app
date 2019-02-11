@@ -1,3 +1,8 @@
+hammoc:
+  build:
+    dockerfile_path: Dockerfile.ci
+  cached: true
+
 hammoc-test:
   build:
     dockerfile_path: Dockerfile.ci

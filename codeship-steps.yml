@@ -1,3 +1,9 @@
-- name: test
-  service: hammoc-test
-  command: mix test
+- name: Run checks
+  type: parallel
+  steps:
+    - name: Check code format
+      service: hammoc
+      command: mix format --check-formatted --dry-run
+    - name: Run test suite
+      service: hammoc-test
+      command: mix test
