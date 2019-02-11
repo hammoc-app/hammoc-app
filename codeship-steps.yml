@@ -1,6 +1,9 @@
 - name: Run checks
   type: parallel
   steps:
+    - name: Check code conventions
+      service: hammoc
+      command: mix credo
     - name: Check code format
       service: hammoc
       command: mix format --check-formatted --dry-run

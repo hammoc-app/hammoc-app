@@ -1,4 +1,6 @@
 defmodule Hammoc.Scraper.Twitter.Loader do
+  @moduledoc "GenStage producer that retrieves a Twitter timeline of likes for a given profile."
+
   use GenStage
 
   def start_link(profile) do
@@ -19,7 +21,6 @@ defmodule Hammoc.Scraper.Twitter.Loader do
   end
 
   def handle_tweets(tweets, state) do
-    IO.inspect([self(), "I am loading new tweets Fuckers!"])
     min_id_tweet = tweets |> Enum.min_by(fn e -> e.id end)
     new_state = state |> Map.put(:cursor, min_id_tweet.id - 1)
     {:noreply, tweets, new_state}

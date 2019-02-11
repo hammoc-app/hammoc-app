@@ -1,4 +1,6 @@
 defmodule Hammoc.Scraper.Twitter.Collector do
+  @moduledoc "GenStage consumer that prints the retrieved Tweets to console."
+
   use GenStage
 
   def start_link(_arg) do
@@ -10,12 +12,11 @@ defmodule Hammoc.Scraper.Twitter.Collector do
   end
 
   def handle_events(tweets, _from, state) do
-    new_tweets = tweets |> Enum.map(fn e -> e.text end)
-    new_tweets |> Enum.each(fn t -> IO.inspect([self(), t]) end)
+    new_tweets =
+      tweets
+      |> Enum.each(fn tweet -> IO.puts("$#{tweet.id_str} #{tweet.created_at} #{tweet.text}") end)
 
-    IO.inspect([self(), "sleeping for 10s"])
     :timer.sleep(10_000)
-    IO.inspect([self(), "awake"])
 
     {:noreply, [], state}
   end

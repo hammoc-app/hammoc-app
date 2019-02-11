@@ -51,7 +51,11 @@ defmodule Hammoc.MixProject do
 
       # Utilities for data
       # ==================
-      {:gen_stage, "~> 0.14"}
+      {:gen_stage, "~> 0.14"},
+
+      # dev & test
+      # ==========
+      {:credo, "~> 1.0"}
     ]
   end
 
