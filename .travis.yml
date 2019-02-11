@@ -3,6 +3,7 @@ elixir: '1.8.0'
 otp_release: '21.1.1'
 
 before_install:
+  - service postgresql stop || true
   - docker run -d --name postgres11 -p 5432:5432 postgres:11.1
   - docker exec -i postgres11 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
 
@@ -16,6 +17,8 @@ jobs:
       script: mix format --check-formatted --dry-run
     - stage: test
       script: mix dialyzer --halt-exit-status
+    - stage: test
+      script: mix test
 
 cache:
   directories:
