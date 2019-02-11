@@ -9,23 +9,27 @@ before_install:
 env:
   - DB_PORT=5433
 
+before_script: mix compile && MIX_ENV=test mix compile
+
 jobs:
   include:
-    - stage: compile
-      script: mix compile
-    - stage: compile
-      script: MIX_ENV=test mix compile
     - stage: test
-      script: mix compile
+      name: Compile warnings
+      script: mix compile --warnings-as-errors
     - stage: test
+      name: Code conventions
       script: mix credo
     - stage: test
+      name: Code format
       script: mix format --check-formatted --dry-run
     - stage: test
+      name: Static code analysis (dev)
       script: mix dialyzer --halt-exit-status
     - stage: test
+      name: Static code analysis (test)
       script: MIX_ENV=test mix dialyzer --halt-exit-status
     - stage: test
+      name: Test suite
       script: mix test
 
 cache:
