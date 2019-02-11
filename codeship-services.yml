@@ -1,0 +1,15 @@
+hammoc-test:
+  build:
+    dockerfile_path: Dockerfile.ci
+  cached: true
+  depends_on:
+    - postgresql
+  environment:
+    DB_HOST: postgresql
+
+postgresql:
+  image: postgres:11.1-alpine
+  environment:
+    POSTGRES_PASSWORD: postgres
+  ports:
+    - 5432
