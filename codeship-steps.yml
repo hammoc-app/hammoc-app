@@ -12,7 +12,7 @@
       command: mix format --check-formatted --dry-run
     - name: Static code analysis
       service: hammoc
-      command: mix dialyzer --halt-exit-status
+      command: mix dialyzer --halt-exit-status --no-compile
     - name: Run test suite
       service: hammoc-test
       command: mix test
