@@ -1,6 +1,6 @@
 - name: Compile
   service: hammoc
-  command: mix compile --warnings-as-errors
+  command: MIX_ENV=test mix compile --warnings-as-errors
 - name: Run checks
   type: parallel
   steps:
@@ -12,7 +12,7 @@
       command: mix format --check-formatted --dry-run
     - name: Static code analysis
       service: hammoc
-      command: mix dialyzer --halt-exit-status --no-compile
+      command: mix dialyzer --halt-exit-status
     - name: Run test suite
       service: hammoc-test
       command: mix test

@@ -9,7 +9,9 @@ before_install:
 env:
   - DB_PORT=5433
 
-before_script: mix compile && MIX_ENV=test mix compile
+install:
+  - mix compile
+  - MIX_ENV=test mix compile
 
 jobs:
   include:
@@ -36,3 +38,6 @@ cache:
   directories:
     - _build
     - deps
+
+before_cache:
+  - rm _build/*/lib/hammoc/.mix/compile.elixir
