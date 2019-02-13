@@ -14,8 +14,8 @@
       service: hammoc
       command: mix dialyzer --halt-exit-status
     - name: Static code analysis (test)
-      service: hammoc
-      command: "MIX_ENV=test mix dialyzer --halt-exit-status"
-    - name: Test suite
       service: hammoc-test
+      command: mix dialyzer --halt-exit-status
+    - name: Test suite
+      service: hammoc-test-postgresql
       command: mix test
