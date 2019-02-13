@@ -11,11 +11,11 @@ defmodule Hammoc.Application do
       # Start the Ecto repository
       Hammoc.Repo,
       # Start the endpoint when the application starts
-      HammocWeb.Endpoint,
+      HammocWeb.Endpoint
       # Starts a worker by calling: Hammoc.Worker.start_link(arg)
       # {Hammoc.Worker, arg},
-      {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
-      Hammoc.Scraper.Twitter.Collector
+      # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
+      # Hammoc.Scraper.Twitter.Collector
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
