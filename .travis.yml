@@ -34,6 +34,3 @@ cache:
   directories:
     - _build
     - deps
-
-before_cache:
-  - rm _build/*/lib/hammoc/.mix/compile.elixir
