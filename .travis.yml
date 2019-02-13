@@ -9,10 +9,6 @@ before_install:
 env:
   - DB_PORT=5433
 
-install:
-  - mix compile
-  - MIX_ENV=test mix compile
-
 jobs:
   include:
     - stage: test

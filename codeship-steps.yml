@@ -1,18 +1,21 @@
 - name: Compile
   service: hammoc
-  command: MIX_ENV=test mix compile --warnings-as-errors
+  command: mix compile
 - name: Run checks
   type: parallel
   steps:
-    - name: Check code conventions
+    - name: Compile warnings
+      service: hammoc
+      command: mix compile --warnings-as-errors
+    - name: Code conventions
       service: hammoc
       command: mix credo
-    - name: Check code format
+    - name: Code format
       service: hammoc
       command: mix format --check-formatted --dry-run
     - name: Static code analysis
       service: hammoc
       command: mix dialyzer --halt-exit-status
-    - name: Run test suite
+    - name: Test suite
       service: hammoc-test
       command: mix test
