@@ -8,6 +8,7 @@ WORKDIR /opt/app
 
 # Cache elixir deps
 COPY mix.exs mix.lock ./
-RUN mix do deps.get, deps.compile
+RUN mix do deps.get, deps.compile && MIX_ENV=test mix deps.compile
 
 COPY . .
+RUN mix compile && MIX_ENV=test mix compile

@@ -1,6 +1,3 @@
-- name: Compile
-  service: hammoc
-  command: mix compile
 - name: Run checks
   type: parallel
   steps:
@@ -13,9 +10,12 @@
     - name: Code format
       service: hammoc
       command: mix format --check-formatted --dry-run
-    - name: Static code analysis
+    - name: Static code analysis (dev)
       service: hammoc
       command: mix dialyzer --halt-exit-status
+    - name: Static code analysis (test)
+      service: hammoc
+      command: "MIX_ENV=test mix dialyzer --halt-exit-status"
     - name: Test suite
       service: hammoc-test
       command: mix test
