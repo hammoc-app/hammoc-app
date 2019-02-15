@@ -24,7 +24,7 @@ defmodule Hammoc.MixProject do
   def application do
     [
       mod: {Hammoc.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :edeliver]
     ]
   end
 
@@ -60,7 +60,12 @@ defmodule Hammoc.MixProject do
       # dev & test
       # ==========
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
+
+      # release & deploy
+      # ================
+      {:edeliver, "~> 1.6"},
+      {:distillery, "~> 2.0"}
     ]
   end
 
