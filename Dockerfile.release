@@ -1,0 +1,47 @@
+# Alpine Linux image with Erlang, Elixir, Node, Hex and Rebar installed
+#   -> https://hub.docker.com/r/bitwalker/alpine-elixir-phoenix
+FROM bitwalker/alpine-elixir-phoenix:1.8.0 as build-stage
+
+ENV MIX_ENV=prod
+
+# Cache elixir deps
+COPY mix.exs mix.lock ./
+RUN mix do deps.get, deps.compile
+
+# Cache npm deps
+COPY assets/package.json assets/package-lock.json assets/
+RUN cd assets && \
+    npm install
+
+# Run frontend build, compile, and digest assets
+COPY assets assets
+RUN cd assets/ && \
+    npm run deploy && \
+    cd - && \
+    mix phx.digest
+
+# Build & extract OTP release
+COPY . .
+RUN mkdir -p /opt/built && \
+    mix release --env=prod --verbose && \
+    export RELEASE_PATH=_build/${MIX_ENV}/rel/hammoc/releases && \
+    export RELEASE_VERSION=$(cut -d' ' -f2 ${RELEASE_PATH}/start_erl.data) && \
+    cp ${RELEASE_PATH}/${RELEASE_VERSION}/hammoc.tar.gz /opt/built/ && \
+    cd /opt/built && \
+    tar -xzf hammoc.tar.gz && \
+    rm hammoc.tar.gz
+
+
+# Alpine Linux image with Erlang installed
+#   -> https://hub.docker.com/r/bitwalker/alpine-erlang
+FROM bitwalker/alpine-erlang:21.1.1
+
+EXPOSE 8080
+ENV PORT=8080 REPLACE_OS_VARS=true
+
+COPY --from=build-stage /opt/built .
+
+USER default
+
+ENTRYPOINT ["./bin/hammoc"]
+CMD ["foreground"]

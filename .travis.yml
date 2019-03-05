@@ -1,6 +1,6 @@
 language: elixir
-elixir: '1.8.0'
-otp_release: '21.1.1'
+elixir: 1.8.0
+otp_release: 21.1.1
 
 before_install:
   - docker run -d --name postgres11 -p 5433:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
@@ -8,6 +8,8 @@ before_install:
 
 env:
   - DB_PORT=5433
+  - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
+  - secure: J3jyz8P5hQdXdntGJRwULvMDgz6yjQHdcvR9kxiXLxieqLr+LLOiLBFbnGRdmrexiFL+IC4FsQ9/3R5xbIqJJqcGFPupjEefUfZrAcKcHfiA8DqsBszeSO9YJf4DhnEegEsjDMhMGIIj0gDTweR9VPbG/ulk4zwQuyzyTtv30WzA/eNXzxm20f6OO7ug6CIFtABq6hw5PzjZ0sc3hU6o6QBxgau7GP3rQ//FdBtUug1CjTLmu9rLwMxdQmy5WmABWq3c7aACazF+BE2qgPqL1u8XBnkK4+Eyy8yyoXNbMIGUrng0P+en+O7OKf4ImaF3rdwkt/k3luWT4DmNIGgubvHDVeRZwkR+indNkvt3rBTWjoG1Xg3TTJQbX7ymwKzj3WNQESfvC+LFhoWUyDdtX7yX2Wk+mVnkfBsJZ8oEDUqRcxT+vf4I9m4ONLRbNA8ZgmTrKO7NvxCqmsTt/UBYWVW55hZxl7YF3DhYNy0TH9PcGBZqrfbqTfncKFMPUU+42SSL6kYUd4hx7ug6ia+BX8q7T9nOqHOZ1UDyFxjUadKrZJTGJ3ruN3WHKBMDIHfOkQKJcXH2nOoRDUKoidEku+f7Ijf5dGK5/rjcP2Zu56dhunc8n55pd+mI+wAwqzoZpyLaGWfrfmSzeBssi5eQvsLWKTQrpmSnR/TpBZUaQkw=
 
 jobs:
   include:
@@ -29,6 +31,15 @@ jobs:
     - stage: test
       name: Test suite
       script: mix test
+
+before_deploy:
+  - docker login -u $DOCKER_USERNAME -p '$DOCKER_PASSWORD'
+
+deploy:
+  provider: script
+  script: (docker pull hammoc/hammoc-unstable || true)
+    && docker build --cache-from hammoc/hammoc-unstable -f Dockerfile.release -t hammoc/hammoc-unstable:latest -t hammoc/hammoc-unstable:$TRAVIS_COMMIT -t hammoc/hammoc-unstable:`date +%Y%m%d` .
+    && docker push hammoc/hammoc-unstable
 
 cache:
   directories:
