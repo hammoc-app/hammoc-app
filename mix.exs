@@ -24,7 +24,7 @@ defmodule Hammoc.MixProject do
   def application do
     [
       mod: {Hammoc.Application, []},
-      extra_applications: [:logger, :runtime_tools, :edeliver]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
@@ -64,7 +64,6 @@ defmodule Hammoc.MixProject do
 
       # release & deploy
       # ================
-      {:edeliver, "~> 1.6"},
       {:distillery, "~> 2.0"}
     ]
   end
