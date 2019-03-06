@@ -2,6 +2,9 @@ language: elixir
 elixir: 1.8.0
 otp_release: 21.1.1
 
+addons:
+  ssh_known_hosts: docs.hammoc.app
+
 before_install:
   - docker run -d --name postgres11 -p 5433:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
   - docker exec -i postgres11 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
