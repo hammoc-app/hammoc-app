@@ -64,7 +64,8 @@ defmodule Hammoc.MixProject do
 
       # release & deploy
       # ================
-      {:distillery, "~> 2.0"}
+      {:distillery, "~> 2.0"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 
