@@ -10,7 +10,7 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :hammoc, HammocWeb.Endpoint,
-  http: [:inet6, port: System.get_env("PORT") || 4000],
+  http: [:inet6, port: 4000],
   url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
@@ -55,9 +55,8 @@ config :logger, level: :info
 #
 # If you are doing OTP releases, you need to instruct Phoenix
 # to start the server for all endpoints:
-#
-#     config :phoenix, :serve_endpoints, true
-#
+config :phoenix, :serve_endpoints, true
+
 # Alternatively, you can configure exactly which server to
 # start per endpoint:
 #
@@ -66,6 +65,10 @@ config :logger, level: :info
 # Note you can't rely on `System.get_env/1` when using releases.
 # See the releases documentation accordingly.
 
-# Finally import the config/prod.secret.exs which should be versioned
-# separately.
-import_config "prod.secret.exs"
+# Configure your database
+config :hammoc, Hammoc.Repo,
+  hostname: "postgresql",
+  username: "postgres",
+  password: "postgres",
+  database: "hammoc_prod",
+  pool_size: 15

@@ -49,7 +49,12 @@ end
 release :hammoc do
   set version: current_version(:hammoc)
   set applications: [
-    :runtime_tools
+    :runtime_tools,
+    expug: :load,
+    oauther: :load
+  ]
+  set commands: [
+    migrate: "rel/commands/migrate.sh"
   ]
 end
 

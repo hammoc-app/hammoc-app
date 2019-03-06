@@ -6,6 +6,14 @@ defmodule Hammoc.Application do
   use Application
 
   def start(_type, _args) do
+    # Twitter configuration
+    ExTwitter.configure(
+      consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
+      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET"),
+      access_token: System.get_env("TWITTER_ACCESS_TOKEN"),
+      access_token_secret: System.get_env("TWITTER_ACCESS_TOKEN_SECRET")
+    )
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository

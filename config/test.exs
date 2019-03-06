@@ -14,6 +14,6 @@ config :hammoc, Hammoc.Repo,
   username: "postgres",
   password: "postgres",
   database: "hammoc_test",
-  hostname: System.get_env("DB_HOST") || "localhost",
-  port: System.get_env("DB_PORT") || "5432",
+  hostname: "localhost",
+  port: "5432",
   pool: Ecto.Adapters.SQL.Sandbox
