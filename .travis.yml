@@ -13,6 +13,7 @@ env:
   global:
     - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
     - DOCKER_REPO=hammoc/hammoc-unstable
+    - DOCKER_BUILD_TAG=hammoc/hammoc-unstable-build:latest
   matrix:
     - DB_PORT=5433
 
@@ -45,13 +46,18 @@ jobs:
         && (if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi)
         && docker build
              -f Dockerfile.release
+             -t $DOCKER_BUILD_TAG
+             --target build-stage
+             .
+        && docker history $DOCKER_BUILD_TAG
+        && (mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q $DOCKER_BUILD_TAG | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE})
+        && docker build
+             -f Dockerfile.release
              -t hammoc/hammoc-unstable:latest
              -t hammoc/hammoc-unstable:$TRAVIS_COMMIT
              -t hammoc/hammoc-unstable:`date +%Y%m%d`
              .
         && (for _ in {1..10}; do docker push hammoc/hammoc-unstable && break; done)
-        && docker history ${DOCKER_REPO}:${TRAVIS_COMMIT}
-        && (mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q ${DOCKER_REPO}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE})
     - stage: deploy
       name: Update docs.hammoc.app
       script: mix docs
