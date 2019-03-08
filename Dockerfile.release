@@ -6,7 +6,7 @@ ENV MIX_ENV=prod
 
 # Cache elixir deps
 COPY mix.exs mix.lock ./
-RUN mix do deps.get, deps.compile
+RUN mix do deps.get --only prod --no-archives-check, deps.compile
 
 # Cache npm deps
 COPY assets/package.json assets/package-lock.json assets/
