@@ -11,7 +11,7 @@ before_install:
 
 env:
   global:
-    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+    - DOCKER_CACHE_DIR=/home/travis/docker
     - DOCKER_REPO=hammoc/hammoc-unstable
     - DOCKER_BUILD_TAG=hammoc/hammoc-unstable-build:latest
   matrix:
@@ -43,14 +43,14 @@ jobs:
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
         - secure: EsHsn95TUrW7D0bKFwnV4Z9CDlho6pwHgfI2mFOMeq5HIbrw7fleOrYgMEGmh/sd/gmAiuuQyQRhBLLL0hyODXQVkNgDWDPP9fetX3jeXK2fXoBE4ShfxZeYR0MVLn+d90w3rlL9hUl4wiS5ToC+fDLxpwF/oiqsR6zwFVOpXbuZniNol/kImbUyuYf2wrrQWfEdp5BIiYGUdH2cYuiwe3yaNg+hFUDPNGTBNqB7UmmVyY7AIHCa/X85HgkIAZBSQZCAstSf7YubErEa4GylYowDxY3SfxgX0cuA37sAqtiybPjKmNWJoCevVv0KQYKqJZ5bfmVkn8vjlWjNFFWLRTci1SWkWxhZwIx5fO2b8wu0UNrnXskz0P3NVJRN0ZV3rXSckp4+fcwFZopqkSSczKaUWO2ZhbWFGNs91suDh2qo8NtUt60I+mvQmipOAOg9p0QZh9tffX2zfqPcA6I4z7Ca6uhUGOMd5ZEU2UluW53YMTRrSMurMARTKY6BJuyfqBigC27wZdcvYXQFxs7cunCr6lui2pTRA6ck9Tf9w14ZJfaceEk/XE3yij8t1E/H9BHD6pRZMNYjpwTXFUSnjKuumqHSpQOcvVZeDKRZUipNVISLz1GR0AW9mOSK5gwRZ67lDOsyGEztePwfbEiovDlnJ6rqs2PptI6b4TehNvM=
       script: (echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin)
-        && (if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load; fi)
+        && (if [ -d $DOCKER_CACHE_DIR ]; then cat $DOCKER_CACHE_DIR/* | docker load; rm $DOCKER_CACHE_DIR/*; fi)
         && docker build
              -f Dockerfile.release
              -t $DOCKER_BUILD_TAG
              --target build-stage
              .
         && docker history $DOCKER_BUILD_TAG
-        && (mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q $DOCKER_BUILD_TAG | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE})
+        && (mkdir -p $DOCKER_CACHE_DIR ; for IMAGE in $(docker history -q $DOCKER_BUILD_TAG | grep -v '<missing>'); do docker save $IMAGE > $DOCKER_CACHE_DIR/$IMAGE.tar; done)
         && docker build
              -f Dockerfile.release
              -t hammoc/hammoc-unstable:latest
