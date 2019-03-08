@@ -10,7 +10,7 @@
 
 
 ready() -> call(<<"READY=1">>).
-reloading() ->call(<<"RELOADING=1">>).
+reloading() -> call(<<"RELOADING=1">>).
 stopping() -> call(<<"STOPPING=1">>).
 watchdog() -> call(<<"WATCHDOG=1">>).
 
@@ -18,7 +18,7 @@ watchdog() -> call(<<"WATCHDOG=1">>).
 call(Call) ->
   case os:getenv("NOTIFY_SOCKET") of
     false ->
-      {error, not_configured};
+      ok;
     Path ->
       case gen_udp:open(0, [local]) of
         {error, SocketError} ->
@@ -36,16 +36,16 @@ start_link() ->
 
 
 init([]) ->
-  ready(),
+  ok = ready(),
   erlang:send_after(60000, self(), watchdog),
   {ok, state}.
 
 
 handle_info(watchdog, State) ->
-  watchdog(),
+  ok = watchdog(),
   erlang:send_after(60000, self(), watchdog),
   {noreply, State}.
 
 terminate(_,_) ->
-  stopping(),
+  ok = stopping(),
   ok.
