@@ -1,12 +1,12 @@
 # [Hammoc](https://hammoc.app/)
 
-[<img src="https://hammoc.app/images/hammoc.svg" alt="Hammoc Logo" width="50%"/>](https://hammoc.app/)
-
 [![Build Status](https://travis-ci.com/hammoc-app/hammoc-app.svg?branch=master)](https://travis-ci.com/hammoc-app/hammoc-app)
 |
 [Docs](https://docs.hammoc.app/)
 |
 [Code Coverage](https://docs.hammoc.app/excoveralls.html)
+
+[<img src="https://hammoc.app/images/hammoc.svg" alt="Hammoc Logo" width="50%"/>](https://hammoc.app/)
 
 Hammoc lets you add all links you shared, bookmarked or liked in your various accounts to one collection.
 Easily find links again, with all the context, or get the Top 5 links every week via e-mail or mobile notification.
