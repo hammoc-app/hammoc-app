@@ -77,13 +77,13 @@ jobs:
         - docker build -f Dockerfile.release -t $DOCKER_REPO:latest -t $DOCKER_REPO:$TRAVIS_COMMIT -t $DOCKER_REPO:`date +%Y%m%d` .
       deploy:
         provider: script
-        skip_cleanup: true
         script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
         on:
           all_branches: true
 
     - name: Update docs.hammoc.app
       stage: deploy
+      script: skip
       env:
         - DB_VERSION=11.1
       before_deploy:
