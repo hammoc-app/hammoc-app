@@ -14,7 +14,9 @@ defmodule Hammoc.MixProject do
       dialyzer: [
         plt_add_apps: [:expug, :ex_unit],
         flags: [:unmatched_returns, :error_handling, :race_conditions, :no_opaque]
-      ]
+      ],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls.html": :test]
     ]
   end
 
@@ -61,6 +63,7 @@ defmodule Hammoc.MixProject do
       # ==========
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.10", only: :test, runtime: false},
 
       # release & deploy
       # ================
