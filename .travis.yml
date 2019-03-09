@@ -63,6 +63,7 @@ jobs:
     - name: Push new Docker image
       stage: deploy
       language: generic
+      cache: false
       env:
         - DOCKER_REPO=hammoc/hammoc-unstable
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
