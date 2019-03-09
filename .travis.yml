@@ -77,6 +77,7 @@ jobs:
         - docker build -f Dockerfile.release -t $DOCKER_REPO:latest -t $DOCKER_REPO:$TRAVIS_COMMIT -t $DOCKER_REPO:`date +%Y%m%d` .
       deploy:
         provider: script
+        skip_cleanup: true
         script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
         on:
           all_branches: true
@@ -93,6 +94,7 @@ jobs:
         - chmod 0600 hammocbot_rsa
       deploy:
         provider: script
+        skip_cleanup: true
         script: rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
         on:
           all_branches: true
