@@ -68,27 +68,29 @@ jobs:
         - DOCKER_REPO=hammoc/hammoc-unstable
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
         - secure: EsHsn95TUrW7D0bKFwnV4Z9CDlho6pwHgfI2mFOMeq5HIbrw7fleOrYgMEGmh/sd/gmAiuuQyQRhBLLL0hyODXQVkNgDWDPP9fetX3jeXK2fXoBE4ShfxZeYR0MVLn+d90w3rlL9hUl4wiS5ToC+fDLxpwF/oiqsR6zwFVOpXbuZniNol/kImbUyuYf2wrrQWfEdp5BIiYGUdH2cYuiwe3yaNg+hFUDPNGTBNqB7UmmVyY7AIHCa/X85HgkIAZBSQZCAstSf7YubErEa4GylYowDxY3SfxgX0cuA37sAqtiybPjKmNWJoCevVv0KQYKqJZ5bfmVkn8vjlWjNFFWLRTci1SWkWxhZwIx5fO2b8wu0UNrnXskz0P3NVJRN0ZV3rXSckp4+fcwFZopqkSSczKaUWO2ZhbWFGNs91suDh2qo8NtUt60I+mvQmipOAOg9p0QZh9tffX2zfqPcA6I4z7Ca6uhUGOMd5ZEU2UluW53YMTRrSMurMARTKY6BJuyfqBigC27wZdcvYXQFxs7cunCr6lui2pTRA6ck9Tf9w14ZJfaceEk/XE3yij8t1E/H9BHD6pRZMNYjpwTXFUSnjKuumqHSpQOcvVZeDKRZUipNVISLz1GR0AW9mOSK5gwRZ67lDOsyGEztePwfbEiovDlnJ6rqs2PptI6b4TehNvM=
-      script: (curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -)
-        && sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        && sudo apt-get update
-        && sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-        && docker --version
-        && (echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin)
-        && docker build
-             -f Dockerfile.release
-             -t $DOCKER_REPO:latest
-             -t $DOCKER_REPO:$TRAVIS_COMMIT
-             -t $DOCKER_REPO:`date +%Y%m%d`
-             .
-        && (for _ in {1..10}; do docker push $DOCKER_REPO && break; done)
-#      if: branch = master
+      before_deploy:
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+        - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+        - docker build -f Dockerfile.release -t $DOCKER_REPO:latest -t $DOCKER_REPO:$TRAVIS_COMMIT -t $DOCKER_REPO:`date +%Y%m%d` .
+      deploy:
+        provider: script
+        script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
+#        on:
+#          branch: master
 
     - name: Update docs.hammoc.app
       stage: deploy
-      script: mix docs
-        && mix coveralls.html
-        && mv cover/excoveralls.html doc/
-        && openssl aes-256-cbc -K $encrypted_d3d7bef984d6_key -iv $encrypted_d3d7bef984d6_iv -in hammocbot_rsa.enc -out hammocbot_rsa -d
-        && chmod 0600 hammocbot_rsa
-        && rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
-      if: branch = master
+      before_deploy:
+        - mix docs
+        - mix coveralls.html
+        - mv cover/excoveralls.html doc/
+        - openssl aes-256-cbc -K $encrypted_d3d7bef984d6_key -iv $encrypted_d3d7bef984d6_iv -in hammocbot_rsa.enc -out hammocbot_rsa -d
+        - chmod 0600 hammocbot_rsa
+      deploy:
+        provider: script
+        script: rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
+        on:
+          branch: master
