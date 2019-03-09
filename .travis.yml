@@ -6,12 +6,16 @@ addons:
   ssh_known_hosts: docs.hammoc.app
 
 before_install:
-  - docker run -d --name postgres11 -p 5433:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
+  - docker run -d --name postgres11 -p 5411:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
+  - docker run -d --name postgres10 -p 5410:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:10-alpine
+  - docker run -d --name postgres9 -p 5409:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:9-alpine
   - docker exec -i postgres11 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
+  - docker exec -i postgres10 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
+  - docker exec -i postgres9 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
 
 env:
-  matrix:
-    - DB_PORT=5433
+  global:
+    - DB_PORT=5411
 
 cache:
   directories:
@@ -42,6 +46,18 @@ jobs:
 
     - name: Test suite
       stage: test
+      script: mix test
+
+    - name: Test suite (PostgreSQL 10)
+      stage: test
+      env:
+        - DB_PORT=5410
+      script: mix test
+
+    - name: Test suite (PostgreSQL 9)
+      stage: test
+      env:
+        - DB_PORT=5409
       script: mix test
 
     - name: Push new Docker image
