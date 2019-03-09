@@ -58,6 +58,8 @@ jobs:
              -t $DOCKER_REPO:`date +%Y%m%d`
              .
         && (for _ in {1..10}; do docker push $DOCKER_REPO && break; done)
+      on:
+        branch: master
 
     - name: Update docs.hammoc.app
       stage: deploy
@@ -67,3 +69,5 @@ jobs:
         && openssl aes-256-cbc -K $encrypted_d3d7bef984d6_key -iv $encrypted_d3d7bef984d6_iv -in hammocbot_rsa.enc -out hammocbot_rsa -d
         && chmod 0600 hammocbot_rsa
         && rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
+      on:
+        branch: master
