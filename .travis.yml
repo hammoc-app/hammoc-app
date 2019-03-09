@@ -6,16 +6,14 @@ addons:
   ssh_known_hosts: docs.hammoc.app
 
 before_install:
-  - docker run -d --name postgres11 -p 5411:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:11.1-alpine
-  - docker run -d --name postgres10 -p 5410:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:10-alpine
-  - docker run -d --name postgres9 -p 5409:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:9-alpine
-  - docker exec -i postgres11 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
-  - docker exec -i postgres10 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
-  - docker exec -i postgres9 bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done'
+  - if [[ $DB_VERSION ]]; then
+      docker run -d --name postgres -p $DB_PORT:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:$DB_VERSION-alpine;
+      docker exec -i postgres bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
+    fi
 
 env:
   global:
-    - DB_PORT=5411
+    - DB_PORT=5433
 
 cache:
   directories:
@@ -44,24 +42,27 @@ jobs:
       stage: test
       script: MIX_ENV=test mix dialyzer --halt-exit-status
 
-    - name: Test suite
+    - name: Test suite (PostgreSQL 11.1)
       stage: test
+      env:
+        - DB_VERSION=11.1
       script: mix test
 
     - name: Test suite (PostgreSQL 10)
       stage: test
       env:
-        - DB_PORT=5410
+        - DB_VERSION=10
       script: mix test
 
     - name: Test suite (PostgreSQL 9)
       stage: test
       env:
-        - DB_PORT=5409
+        - DB_VERSION=9
       script: mix test
 
     - name: Push new Docker image
       stage: deploy
+      language: generic
       env:
         - DOCKER_REPO=hammoc/hammoc-unstable
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
