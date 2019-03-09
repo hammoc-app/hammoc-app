@@ -75,7 +75,6 @@ jobs:
              -t $DOCKER_REPO:`date +%Y%m%d`
              .
         && (for _ in {1..10}; do docker push $DOCKER_REPO && break; done)
-      if: branch = master
 
     - name: Update docs.hammoc.app
       stage: deploy
