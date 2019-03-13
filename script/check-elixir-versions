@@ -35,9 +35,7 @@ fi
 # Dockerfile Elixir versions
 DOCKERFILE_VERSION_LINES=$(grep -E '^FROM \S*?elixir' -Hn Dockerfile*)
 
-IFS=$'\n' # use newlines as separator
-REGEX=$'^(.*)\:(.*)\:(.*)'
-# REGEX=$'^(.*):'
+IFS=$'\n' # use newlines as separator in for loop
 
 for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
   VERSION=$(echo $VERSION_LINE | grep -E '(\d+\.)+\d+' -o)

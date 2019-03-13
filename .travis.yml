@@ -24,7 +24,6 @@ jobs:
   include:
     - name: Check Elixir versions used
       stage: test
-      language: generic
       cache: false
       script: script/check-elixir-versions
 
