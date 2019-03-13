@@ -3,15 +3,15 @@
 EXIT_CODE=0
 
 # Reference Elixir version from .tool-versions file
-REFERENCE_VERSION=$(cat .tool-versions | grep elixir | cut -d' ' -f2)
+ELIXIR_REFERENCE_VERSION=$(cat .tool-versions | grep elixir | cut -d' ' -f2)
 ERLANG_REFERENCE_VERSION=$(cat .tool-versions | grep erlang | cut -d' ' -f2)
 
-if [ -z $REFERENCE_VERSION ]; then
+if [ -z $ELIXIR_REFERENCE_VERSION ]; then
    echo "No Elixir version defined in .tool-versions"
    exit 1
 fi
 
-echo "Expecting Elixir version $REFERENCE_VERSION (from .tool-versions)"
+echo "Expecting Elixir version $ELIXIR_REFERENCE_VERSION (from .tool-versions)"
 echo "Expecting Erlang version $ERLANG_REFERENCE_VERSION (from .tool-versions)"
 
 
@@ -27,10 +27,12 @@ elif [ -z $CLI_VERSION ]; then
   echo "No Elixir executable version found for $CLI_PATH"
   echo "  -> $CLI_OUTPUT"
   EXIT_CODE=1
-elif [ $CLI_VERSION != $REFERENCE_VERSION ]; then
+elif [ $CLI_VERSION != $ELIXIR_REFERENCE_VERSION ]; then
   echo "Current Elixir executable is version $CLI_VERSION"
   echo "  -> $CLI_PATH"
   EXIT_CODE=1
+else
+  echo "Elixir executable version: $CLI_VERSION (at $CLI_PATH)"
 fi
 
 
@@ -45,6 +47,8 @@ elif [ $CLI_VERSION != $ERLANG_REFERENCE_VERSION ]; then
   echo "Current Erlang executable is version $CLI_VERSION"
   echo "  -> $CLI_PATH"
   EXIT_CODE=1
+else
+  echo "Erlang executable version: $CLI_VERSION (at $CLI_PATH)"
 fi
 
 
@@ -58,7 +62,7 @@ for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
   FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
   LINE=$(echo $VERSION_LINE | cut -d':' -f3-99)
 
-  if [[ $VERSION != $REFERENCE_VERSION ]]; then
+  if [[ $VERSION != $ELIXIR_REFERENCE_VERSION ]]; then
     echo "Found Elixir version $VERSION in $FILE"
     echo "  -> $LINE"
     EXIT_CODE=1
@@ -74,10 +78,11 @@ if [ -z $DOCKER_CLI ]; then
 else
   for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
     IMAGE=$(echo $VERSION_LINE | cut -d' ' -f2)
+    FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
     VERSION=$($DOCKER_CLI run $IMAGE erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell)
 
     if [[ $VERSION != $ERLANG_REFERENCE_VERSION ]]; then
-      echo "Found Erlang version $VERSION in $IMAGE"
+      echo "Found Erlang version $VERSION in $IMAGE ($FILE)"
       EXIT_CODE=1
     fi
   done

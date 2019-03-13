@@ -89,8 +89,7 @@ jobs:
       deploy:
         provider: script
         script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
-        on:
-          branch: master
+      if: branch = master
 
     - name: Update docs.hammoc.app
       stage: deploy
@@ -107,5 +106,4 @@ jobs:
         provider: script
         skip_cleanup: true
         script: rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
-        on:
-          branch: master
+      if: branch = master
