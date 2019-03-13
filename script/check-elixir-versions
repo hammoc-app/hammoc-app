@@ -1,0 +1,54 @@
+#!/bin/bash
+
+EXIT_CODE=0
+
+# Reference Elixir version from .tool-versions file
+REFERENCE_VERSION=$(cat .tool-versions | grep elixir | cut -d' ' -f2)
+
+if [ -z $REFERENCE_VERSION ]; then
+   echo "No Elixir version defined in .tool-versions"
+   exit 1
+fi
+
+echo "Expecting Elixir version $REFERENCE_VERSION (from .tool-versions)"
+
+
+# Executable Elixir version
+CLI_PATH=$(which elixir)
+CLI_OUTPUT=$(elixir --version)
+CLI_VERSION=$(elixir --version | grep Elixir | cut -d' ' -f2)
+
+if [ -z $CLI_PATH ]; then
+  echo "No Elixir executable found"
+  EXIT_CODE=1
+elif [ -z $CLI_VERSION ]; then
+   echo "No Elixir executable version found for $CLI_PATH"
+   echo "  -> $CLI_OUTPUT"
+   EXIT_CODE=1
+elif [ $CLI_VERSION != $REFERENCE_VERSION ]; then
+  echo "Current Elixir executable is version $CLI_VERSION"
+  echo "  -> $CLI_PATH"
+  EXIT_CODE=1
+fi
+
+
+# Dockerfile Elixir versions
+DOCKERFILE_VERSION_LINES=$(grep -E '^FROM \S*?elixir' -Hn Dockerfile*)
+
+IFS=$'\n' # use newlines as separator
+REGEX=$'^(.*)\:(.*)\:(.*)'
+# REGEX=$'^(.*):'
+
+for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
+  VERSION=$(echo $VERSION_LINE | grep -E '(\d+\.)+\d+' -o)
+  FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
+  LINE=$(echo $VERSION_LINE | cut -d':' -f3-99)
+
+  if [ $VERSION != $REFERENCE_VERSION ]; then
+    echo "Found Elixir version $VERSION in $FILE"
+    echo "  -> $LINE"
+    EXIT_CODE=1
+  fi
+done
+
+exit $EXIT_CODE

@@ -22,6 +22,12 @@ cache:
 
 jobs:
   include:
+    - name: Check Elixir versions used
+      stage: test
+      language: generic
+      cache: false
+      script: script/check-elixir-versions
+
     - name: Static code analysis (dev)
       stage: test
       script: mix dialyzer --halt-exit-status
@@ -84,7 +90,7 @@ jobs:
         provider: script
         script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
         on:
-          all_branches: true
+          branch: master
 
     - name: Update docs.hammoc.app
       stage: deploy
@@ -102,4 +108,4 @@ jobs:
         skip_cleanup: true
         script: rsync --verbose --recursive --delete -e "ssh -i ./hammocbot_rsa" doc/ hammocbot@docs.hammoc.app:/var/www/hammoc-docs
         on:
-          all_branches: true
+          branch: master
