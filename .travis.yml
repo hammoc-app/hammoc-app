@@ -22,11 +22,6 @@ cache:
 
 jobs:
   include:
-    - name: Check Elixir versions used
-      stage: test
-      cache: false
-      script: script/check-elixir-versions
-
     - name: Static code analysis (dev)
       stage: test
       script: mix dialyzer --halt-exit-status
@@ -64,6 +59,12 @@ jobs:
     - name: Code format
       stage: test
       script: mix format --check-formatted --dry-run
+
+    - name: Check Elixir & Erlang versions used
+      stage: test
+      cache: false
+      install: skip
+      script: script/check-elixir-versions
 
     - name: Push new Docker image
       stage: deploy
