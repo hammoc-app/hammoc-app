@@ -74,7 +74,12 @@ jobs:
         - sudo apt-get update
         - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
-        - docker build -f Dockerfile.release -t $DOCKER_REPO:latest -t $DOCKER_REPO:$TRAVIS_COMMIT -t $DOCKER_REPO:`date +%Y%m%d` .
+        - docker build
+            -f Dockerfile.release
+            -t $DOCKER_REPO:latest
+            -t $DOCKER_REPO:$TRAVIS_COMMIT
+            -t $DOCKER_REPO:`date +%Y%m%d`
+            .
       deploy:
         provider: script
         script: for _ in {1..10}; do docker push $DOCKER_REPO && break; done
