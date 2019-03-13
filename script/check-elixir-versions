@@ -42,7 +42,7 @@ for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
   FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
   LINE=$(echo $VERSION_LINE | cut -d':' -f3-99)
 
-  if [ $VERSION != $REFERENCE_VERSION ]; then
+  if [[ $VERSION != $REFERENCE_VERSION ]]; then
     echo "Found Elixir version $VERSION in $FILE"
     echo "  -> $LINE"
     EXIT_CODE=1
