@@ -68,7 +68,7 @@ jobs:
 
     - name: Push new Docker image
       stage: deploy
-      language: generic
+      language: minimal
       cache: false
       env:
         - DOCKER_REPO=hammoc/hammoc-unstable
