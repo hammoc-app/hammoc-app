@@ -78,8 +78,10 @@ if [ -z $DOCKER_CLI ]; then
 else
   for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
     IMAGE=$(echo $VERSION_LINE | cut -d' ' -f2)
+    $DOCKER_CLI pull $IMAGE > /dev/null
+
     FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
-    VERSION=$($DOCKER_CLI run $IMAGE erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell)
+    VERSION=$($DOCKER_CLI run --rm $IMAGE erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell)
 
     if [[ $VERSION != $ERLANG_REFERENCE_VERSION ]]; then
       echo "Found Erlang version $VERSION in $IMAGE ($FILE)"
