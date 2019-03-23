@@ -48,9 +48,11 @@ jobs:
         - DB_VERSION=9
       script: mix test
 
-    - name: Compile warnings
+    - name: Compiler warnings
       stage: test
-      script: mix compile --warnings-as-errors
+      env:
+        - DB_VERSION=11.1
+      script: mix compile --warnings-as-errors --force && WARNINGS_AS_ERRORS=true mix test
 
     - name: Code conventions
       stage: test
