@@ -55,6 +55,11 @@ defmodule Hammoc.MixProject do
       # ========
       {:extwitter, "~> 0.9"},
 
+      # Authentication
+      # ==============
+      {:ueberauth, "~> 0.6"},
+      {:ueberauth_twitter, github: "hammoc-app/ueberauth_twitter"},
+
       # Utilities for data
       # ==================
       {:gen_stage, "~> 0.14"},

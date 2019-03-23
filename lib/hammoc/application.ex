@@ -14,6 +14,11 @@ defmodule Hammoc.Application do
       access_token_secret: System.get_env("TWITTER_ACCESS_TOKEN_SECRET")
     )
 
+    Application.put_env(:ueberauth, Ueberauth.Strategy.Twitter.OAuth,
+      consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
+      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET")
+    )
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository

@@ -30,6 +30,8 @@ config :phoenix, :template_engines, pug: PhoenixExpug.Engine
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :ueberauth, Ueberauth, providers: [twitter: {Ueberauth.Strategy.Twitter, []}]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
