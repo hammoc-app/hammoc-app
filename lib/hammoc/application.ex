@@ -6,6 +6,14 @@ defmodule Hammoc.Application do
   use Application
 
   def start(_type, _args) do
+    # Twitter configuration
+    ExTwitter.configure(
+      consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
+      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET"),
+      access_token: System.get_env("TWITTER_ACCESS_TOKEN"),
+      access_token_secret: System.get_env("TWITTER_ACCESS_TOKEN_SECRET")
+    )
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
@@ -13,9 +21,10 @@ defmodule Hammoc.Application do
       # Start the endpoint when the application starts
       HammocWeb.Endpoint,
       # Starts a worker by calling: Hammoc.Worker.start_link(arg)
+      %{id: :systemd, start: {:systemd, :start_link, []}}
       # {Hammoc.Worker, arg},
-      {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
-      Hammoc.Scraper.Twitter.Collector
+      # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
+      # Hammoc.Scraper.Twitter.Collector
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,0 +1,110 @@
+#!/bin/bash
+
+EXIT_CODE=0
+
+# Reference Elixir version from .tool-versions file
+ELIXIR_REFERENCE_VERSION=$(cat .tool-versions | grep elixir | cut -d' ' -f2)
+ERLANG_REFERENCE_VERSION=$(cat .tool-versions | grep erlang | cut -d' ' -f2)
+
+if [ -z $ELIXIR_REFERENCE_VERSION ]; then
+   echo "No Elixir version defined in .tool-versions"
+   exit 1
+fi
+
+echo "Expecting Elixir version $ELIXIR_REFERENCE_VERSION (from .tool-versions)"
+echo "Expecting Erlang version $ERLANG_REFERENCE_VERSION (from .tool-versions)"
+
+
+# Executable Elixir version
+CLI_PATH=$(which elixir)
+CLI_OUTPUT=$(elixir --version)
+CLI_VERSION=$(elixir --version | grep Elixir | cut -d' ' -f2)
+
+if [ -z $CLI_PATH ]; then
+  echo "No Elixir executable found"
+  EXIT_CODE=1
+elif [ -z $CLI_VERSION ]; then
+  echo "No Elixir executable version found for $CLI_PATH"
+  echo "  -> $CLI_OUTPUT"
+  EXIT_CODE=1
+elif [ $CLI_VERSION != $ELIXIR_REFERENCE_VERSION ]; then
+  echo "Current Elixir executable is version $CLI_VERSION"
+  echo "  -> $CLI_PATH"
+  EXIT_CODE=1
+else
+  echo "Elixir executable version: $CLI_VERSION (at $CLI_PATH)"
+fi
+
+
+# Executable Erlang version
+CLI_PATH=$(which erl)
+CLI_VERSION=$(erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell)
+
+if [ -z $CLI_PATH ]; then
+  echo "No Erlang executable found"
+  EXIT_CODE=1
+elif [ $CLI_VERSION != $ERLANG_REFERENCE_VERSION ]; then
+  echo "Current Erlang executable is version $CLI_VERSION"
+  echo "  -> $CLI_PATH"
+  EXIT_CODE=1
+else
+  echo "Erlang executable version: $CLI_VERSION (at $CLI_PATH)"
+fi
+
+
+# Dockerfile Elixir versions
+DOCKERFILE_VERSION_LINES=$(grep -E '^FROM \S*?elixir' -Hn Dockerfile*)
+
+IFS=$'\n' # use newlines as separator in for loop
+
+for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
+  VERSION=$(echo $VERSION_LINE | cut -d' ' -f2 | cut -d':' -f2)
+  FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
+  LINE=$(echo $VERSION_LINE | cut -d':' -f3-99)
+
+  if [[ $VERSION != $ELIXIR_REFERENCE_VERSION ]]; then
+    echo "Found Elixir version $VERSION in $FILE"
+    echo "  -> $LINE"
+    EXIT_CODE=1
+  fi
+done
+
+
+# Erlang versions in Docker images
+DOCKER_CLI=$(which docker)
+
+if [ -z $DOCKER_CLI ]; then
+  echo "No docker executable present. Skipped external image tests."
+else
+  for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
+    IMAGE=$(echo $VERSION_LINE | cut -d' ' -f2)
+    $DOCKER_CLI pull $IMAGE > /dev/null
+
+    FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
+    VERSION=$($DOCKER_CLI run --rm $IMAGE erl -eval '{ok, Version} = file:read_file(filename:join([code:root_dir(), "releases", erlang:system_info(otp_release), "OTP_VERSION"])), io:fwrite(Version), halt().' -noshell)
+
+    if [[ $VERSION != $ERLANG_REFERENCE_VERSION ]]; then
+      echo "Found Erlang version $VERSION in $IMAGE ($FILE)"
+      EXIT_CODE=1
+    fi
+  done
+fi
+
+
+# Dockerfile Erlang versions
+DOCKERFILE_VERSION_LINES=$(grep -E '^FROM \S*?erlang' -Hn Dockerfile*)
+
+for VERSION_LINE in $DOCKERFILE_VERSION_LINES; do
+  VERSION=$(echo $VERSION_LINE | cut -d' ' -f2 | cut -d':' -f2)
+  FILE=$(echo $VERSION_LINE | cut -d':' -f1-2)
+  LINE=$(echo $VERSION_LINE | cut -d':' -f3-99)
+
+  if [[ $VERSION != $ERLANG_REFERENCE_VERSION ]]; then
+    echo "Found Erlang version $VERSION in $FILE"
+    echo "  -> $LINE"
+    EXIT_CODE=1
+  fi
+done
+
+
+exit $EXIT_CODE

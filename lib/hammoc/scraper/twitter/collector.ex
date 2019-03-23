@@ -1,23 +1,22 @@
 defmodule Hammoc.Scraper.Twitter.Collector do
-	use GenStage
+  @moduledoc "GenStage consumer that prints the retrieved Tweets to console."
 
-	def start_link(_arg) do
-		GenStage.start_link(__MODULE__, nil)
-	end
+  use GenStage
 
-	def init(nil) do
-		{:consumer, nil, subscribe_to: [{Hammoc.Scraper.Twitter.Loader, max_demand: 20}]}
-	end
+  def start_link(_arg) do
+    GenStage.start_link(__MODULE__, nil)
+  end
 
-	def handle_events(tweets, _from, state) do
-		new_tweets = tweets |> Enum.map(fn e -> e.text end)
-		new_tweets |> Enum.each(fn t -> IO.inspect([self(),t]) end)
+  def init(nil) do
+    {:consumer, nil, subscribe_to: [{Hammoc.Scraper.Twitter.Loader, max_demand: 20}]}
+  end
 
-		IO.inspect [self(),"sleeping for 10s"]
-		:timer.sleep(10_000)
-		IO.inspect [self(),"awake"]
+  def handle_events(tweets, _from, state) do
+    tweets
+    |> Enum.each(fn tweet -> IO.puts("$#{tweet.id_str} #{tweet.created_at} #{tweet.text}") end)
 
-		{:noreply, [], state}
-	end
+    :timer.sleep(10_000)
 
+    {:noreply, [], state}
+  end
 end

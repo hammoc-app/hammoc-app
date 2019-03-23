@@ -1,6 +1,10 @@
 defmodule HammocWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :hammoc
 
+  @env_vars secret_key_base: "SECRET_KEY_BASE",
+            http: [port: "PORT"],
+            url: [scheme: "SITE_SCHEME", host: "SITE_HOST", port: "SITE_PORT"]
+
   socket "/socket", HammocWeb.UserSocket,
     websocket: true,
     longpoll: false
@@ -43,4 +47,8 @@ defmodule HammocWeb.Endpoint do
     signing_salt: "6VJMM1jz"
 
   plug HammocWeb.Router
+
+  def init(_type, config) do
+    Util.Config.merge_environment_variables(config, @env_vars)
+  end
 end

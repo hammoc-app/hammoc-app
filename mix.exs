@@ -10,7 +10,13 @@ defmodule Hammoc.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:expug, :ex_unit],
+        flags: [:unmatched_returns, :error_handling, :race_conditions, :no_opaque]
+      ],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls.html": :test]
     ]
   end
 
@@ -51,7 +57,18 @@ defmodule Hammoc.MixProject do
 
       # Utilities for data
       # ==================
-      {:gen_stage, "~> 0.14"}
+      {:gen_stage, "~> 0.14"},
+
+      # dev & test
+      # ==========
+      {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.10", only: :test, runtime: false},
+
+      # release & deploy
+      # ================
+      {:distillery, "~> 2.0"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 
