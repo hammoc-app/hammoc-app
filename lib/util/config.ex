@@ -3,6 +3,17 @@ defmodule Util.Config do
   Helper functions for working with dynamic runtime configuration of libraries such as ecto and phoenix
   """
 
+  defmodule Var do
+    use TypedStruct
+
+    typedstruct do
+      field(:name, String.t(), enforce: true)
+      field(:transform, (String.t() -> any()), default: &Var.preserve/1)
+    end
+
+    def preserve(val), do: val
+  end
+
   def merge_environment_variables(config, env_vars) do
     merge_environment_variables(config, env_vars, System.get_env())
   end
@@ -33,6 +44,13 @@ defmodule Util.Config do
       ...>   %{"PORT" => "8080", "SITE_HOST" => "hammoc.app", "SITE_PORT" => "80"}
       ...> )
       {:ok, url: [host: "hammoc.app", port: "80"], http: [:inet4, port: "8080"]}
+
+      iex> Util.Config.merge_environment_variables(
+      ...>   [ciphers: [default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: "secuRRRe"}]],
+      ...>   [ciphers: [default: {[key: %Util.Config.Var{name: "HAMMOC_VAULT_KEY", transform: &Base.decode64!/1}]}]],
+      ...>   %{"HAMMOC_VAULT_KEY" => Base.encode64("m04rs3cuRRR3")}
+      ...> )
+      {:ok, ciphers: [default: {Cloak.Ciphers.AES.GCM, key: "m04rs3cuRRR3", tag: "AES.GCM.V1"}]}
   """
   @spec merge_environment_variables(Keyword.t(), Keyword.t()) :: {:ok, Keyword.t()}
   def merge_environment_variables(config, to_merge, env) do
@@ -42,6 +60,11 @@ defmodule Util.Config do
   # end condition
   defp do_merge(config_list, [], _env) do
     config_list
+  end
+
+  # nested lists -> go into
+  defp do_merge([config_list], [tail], env) when is_list(config_list) and is_list(tail) do
+    [do_merge(config_list, tail, env)]
   end
 
   # An atom in the existing config -> leave it in & continue
@@ -58,11 +81,32 @@ defmodule Util.Config do
     end
   end
 
+  # Keyword pair with Util.Config.Var value -> lookup & replace, then continue
+  defp do_merge(
+         config_list,
+         [{merge_key, %Util.Config.Var{name: name, transform: fun}} | tail],
+         env
+       ) do
+    case env[name] do
+      nil -> do_merge(config_list, tail, env)
+      "" -> do_merge(config_list, tail, env)
+      val -> Keyword.put(do_merge(config_list, tail, env), merge_key, fun.(val))
+    end
+  end
+
   # Keyword pair with list value (nested sub config) -> recurse into sub config & replace, then continue
   defp do_merge(config_list, [{merge_key, merge_val} | tail], env) when is_list(merge_val) do
     old_sub_config_list = Keyword.get(config_list, merge_key, [])
     new_sub_config_list = do_merge(old_sub_config_list, merge_val, env)
     new_config_list = Keyword.put(config_list, merge_key, new_sub_config_list)
+    do_merge(new_config_list, tail, env)
+  end
+
+  # Nested tuple -> recurse into sub config & replace, then continue
+  defp do_merge(config_list, [{merge_key, merge_val} | tail], env) when is_tuple(merge_val) do
+    old_sub_config_list = Keyword.get(config_list, merge_key, {}) |> Tuple.to_list()
+    new_sub_config_list = do_merge(old_sub_config_list, Tuple.to_list(merge_val), env)
+    new_config_list = Keyword.put(config_list, merge_key, List.to_tuple(new_sub_config_list))
     do_merge(new_config_list, tail, env)
   end
 end

@@ -26,7 +26,8 @@ defmodule Hammoc.Application do
       # Start the endpoint when the application starts
       HammocWeb.Endpoint,
       # Starts a worker by calling: Hammoc.Worker.start_link(arg)
-      %{id: :systemd, start: {:systemd, :start_link, []}}
+      %{id: :systemd, start: {:systemd, :start_link, []}},
+      Hammoc.Vault
       # {Hammoc.Worker, arg},
       # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
       # Hammoc.Scraper.Twitter.Collector

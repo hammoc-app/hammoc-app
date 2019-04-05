@@ -72,3 +72,8 @@ config :hammoc, Hammoc.Repo,
   password: "postgres",
   database: "hammoc_prod",
   pool_size: 15
+
+# Handles encryption
+#   -> set encryption key via `HAMMOC_VAULT_KEY` in Base64 encoding
+config :hammoc, Hammoc.Vault, ciphers: [default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: nil}]
+

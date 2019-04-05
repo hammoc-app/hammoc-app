@@ -30,6 +30,10 @@ config :phoenix, :template_engines, pug: PhoenixExpug.Engine
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+# Handles encryption
+#   -> set encryption key via `HAMMOC_VAULT_KEY` in Base64 encoding
+config :hammoc, Hammoc.Vault, ciphers: [default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: "not-secure"}]
+
 config :ueberauth, Ueberauth, providers: [twitter: {Ueberauth.Strategy.Twitter, []}]
 
 # Import environment specific config. This must remain at the bottom
