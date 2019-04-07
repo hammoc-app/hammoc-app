@@ -8,7 +8,7 @@ defmodule Hammoc.Vault do
   To generate a key:
   ```
   $ iex
-  iex> 32 |> :crypto.strong_rand_bytes() |> Base.encode64()
+  iex> 64 |> :crypto.strong_rand_bytes() |> Base.encode64()
   ```
   """
 

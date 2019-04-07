@@ -64,6 +64,7 @@ defmodule Hammoc.MixProject do
       # =============
       {:gen_stage, "~> 0.14"},
       {:cloak_ecto, "~> 1.0.0-alpha.0"},
+      {:pbkdf2, "~> 2.0"},
 
       # Language extensions
       # ===================
@@ -75,6 +76,7 @@ defmodule Hammoc.MixProject do
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:mix_test_watch, "~> 0.9", only: :dev, runtime: false},
+      {:faker, "~> 0.12", only: [:dev, :test]},
 
       # release & deploy
       # ================

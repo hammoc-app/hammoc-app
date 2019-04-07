@@ -31,8 +31,20 @@ config :phoenix, :template_engines, pug: PhoenixExpug.Engine
 config :phoenix, :json_library, Jason
 
 # Handles encryption
-#   -> set encryption key via `HAMMOC_VAULT_KEY` in Base64 encoding
-config :hammoc, Hammoc.Vault, ciphers: [default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: "not-secure"}]
+#  -> set encryption key via `HAMMOC_VAULT_KEY` and `HAMMOC_PBKDF2_SECRET` in Base64 encoding
+#  -> to generate each in `iex`: `64 |> :crypto.strong_rand_bytes() |> Base.encode64()`
+config :hammoc, Hammoc.Vault,
+  ciphers: [
+    default:
+      {Cloak.Ciphers.AES.GCM,
+       tag: "AES.GCM.V1", key: <<0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7>>}
+  ]
+
+config :hammoc, Hammoc.Ecto.Hashed.PBKDF2,
+  algorithm: :sha256,
+  iterations: 10_000,
+  secret: "not-so-secret",
+  size: 64
 
 config :ueberauth, Ueberauth, providers: [twitter: {Ueberauth.Strategy.Twitter, []}]
 

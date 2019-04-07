@@ -4,6 +4,8 @@ defmodule Util.Config do
   """
 
   defmodule Var do
+    @moduledoc "Specifies how a config variable should be computed."
+
     use TypedStruct
 
     typedstruct do
