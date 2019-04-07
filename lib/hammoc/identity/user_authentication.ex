@@ -7,13 +7,13 @@ defmodule Hammoc.Identity.UserAuthentication do
 
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: true}
+  @primary_key false
   @foreign_key_type :binary_id
   @required_fields [:user_id, :authentication_id]
 
   schema "users_authentications" do
-    belongs_to(:user, User)
-    belongs_to(:authentication, Authentication)
+    belongs_to :user, User, primary_key: true
+    belongs_to :authentication, Authentication, primary_key: true
 
     timestamps()
   end
