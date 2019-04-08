@@ -2,8 +2,7 @@ defmodule Hammoc.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def up do
-    create table(:users, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+    create table(:users) do
       add :email, :binary
       add :email_hash, :binary
       add :newsletter, :boolean

@@ -2,8 +2,7 @@ defmodule Hammoc.Repo.Migrations.CreateAuthentications do
   use Ecto.Migration
 
   def up do
-    create table(:authentications, primary_key: false) do
-      add :id, :binary_id, primary_key: true
+    create table(:authentications) do
       add :provider, :string
       add :uid, :binary
       add :uid_hash, :binary

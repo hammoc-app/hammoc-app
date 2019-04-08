@@ -11,6 +11,8 @@ config :hammoc,
   ecto_repos: [Hammoc.Repo],
   generators: [binary_id: true]
 
+config :hammoc, Hammoc.Repo, migration_primary_key: [type: :binary_id]
+
 # Configures the endpoint
 config :hammoc, HammocWeb.Endpoint,
   url: [host: "localhost"],
