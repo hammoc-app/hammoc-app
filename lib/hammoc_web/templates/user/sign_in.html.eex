@@ -1,0 +1,7 @@
+<div class="section">
+  <%= for user <- @users do %>
+    <option value="<%= user.id %>">
+      <%= user.email %>
+    </option>
+  <% end %>
+</div>

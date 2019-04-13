@@ -7,6 +7,7 @@ defmodule Hammoc.Repo.Migrations.CreateUsers do
       add :email_hash, :binary
       add :newsletter, :boolean
       add :weekly_digest, :boolean
+      add :started, :boolean, null: false, default: false
 
       timestamps()
     end
