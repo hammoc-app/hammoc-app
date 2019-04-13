@@ -23,10 +23,6 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# Parse .pug template files using expug
-#   -> https://hexdocs.pm/expug/syntax.html
-config :phoenix, :template_engines, pug: PhoenixExpug.Engine
-
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

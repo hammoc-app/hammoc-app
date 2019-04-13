@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Hello Hammoc!</title>
+    <link href="<%= Routes.static_path(@conn, "/css/app.css") %>" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav aria-label="main navigation" class="navbar is-light" role="navigation">
+      <div class="container">
+        <div class="navbar-brand">
+          <div class="logo-container">
+            <img src="/images/hammoc.svg" width="247" height="49">
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+    <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+
+    <main role="main">
+      <%= render @view_module, @view_template, assigns %>
+    </main>
+
+    <script src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+  </body>
+</html>

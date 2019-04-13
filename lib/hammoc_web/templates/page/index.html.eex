@@ -1,0 +1,108 @@
+<div class="hero is-primary is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <div class="title">
+        Your digital memory
+      </div>
+      <div class="subtitle">
+        Everything you bookmarked, liked or shared at one place.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <div class="card has-shadow is-rounded" style="height: 115%">
+          <div class="card-content has-text-centered">
+            <div class="title">
+              All your links, at one place
+            </div>
+            <hr>
+            Get an overview of all items you liked or saved
+            anywhere. Filter and search among them by any aspect, including
+            title, content, who posted them, or how you got them.
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="card has-shadow is-rounded" style="height: 110%">
+          <div class="card-content has-text-centered">
+            <div class="title">
+              Organize & Discover
+            </div>
+            <hr>
+            Hammoc assumes that you find more interesting stuff than
+            you can digest at a time, scattered across many places.
+            It helps you keep an overview and prioritize so you can use
+            your time in a more meaningful way.
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="card has-shadow is-rounded" style="height: 105%">
+          <div class="card-content has-text-centered">
+            <div class="title">
+              Keep your habits
+            </div>
+            <hr>
+            Hammoc connects to the channels you already use,
+            so you don't have to change anything.
+          </div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="card has-shadow is-rounded" style="height: 100%">
+          <div class="card-content has-text-centered">
+            <div class="title">
+              Open & Secure
+            </div>
+            <hr>
+            Hammoc is an open-source project with a focus on data privacy.
+            Everyone can customize, extend and run it on own servers.
+            Hammoc.io is just one instance, professionally hosted in Europe.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="container has-text-centered">
+    <div class="title">
+      Supported channels
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-10 is-8-fullhd">
+        <div class="columns is-mobile">
+        <%= for name <- ["instagram", "facebook", "twitter", "linkedin", "youtube", "pinterest", "medium", "mozilla", "safari", "chrome"] do %>
+          <div class="column">
+            <img height="56" src="/images/platforms/<%= name %>.svg" width="56">
+          </div>
+        <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="hero is-primary">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <div class="title">
+        Open up your Hammoc
+      </div>
+      <div class="button has-text-weight-bold">
+        <a href="https://hammoc.typeform.com/to/Nd5w3R" target="_blank">
+          I'm interested!
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
