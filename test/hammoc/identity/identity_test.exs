@@ -15,8 +15,7 @@ defmodule Hammoc.IdentityTest do
           nickname: fields.nickname
         })
 
-      %User{authentications: [auth]} = record
-      assert Util.Map.subset?(fields, auth)
+      assert_nested(%{authentications: [fields]}, record)
 
       {:ok, [record2]} =
         Identity.authenticate_via_oauth(nil, fields.provider, fields.uid, %{
@@ -25,8 +24,7 @@ defmodule Hammoc.IdentityTest do
           nickname: fields.nickname
         })
 
-      %User{authentications: [auth]} = record2
-      assert Util.Map.subset?(fields, auth)
+      assert_nested(%{authentications: [fields]}, record2)
 
       assert record.id == record2.id
     end
@@ -44,9 +42,7 @@ defmodule Hammoc.IdentityTest do
           Map.take(auth, [:access_token, :access_token_secret])
         )
 
-      user_id = user.id
-      user_email = user.email
-      assert Util.Map.subset?(%{id: user_id, email: user_email}, record)
+      assert_nested(%{id: user.id, email: user.email}, record)
     end
   end
 end

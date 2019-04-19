@@ -23,6 +23,9 @@ defmodule Hammoc.DataCase do
       import Ecto.Query
       import Hammoc.DataCase
       import Test.Support.Factory
+      import Test.Support.AssertNested
+
+      require Test.Support.AssertNested
     end
   end
 
