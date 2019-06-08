@@ -64,8 +64,8 @@ defmodule Hammoc.Identity do
   defp ensure_auth_has_user(auth), do: {:ok, auth}
 
   def get_user(user_id) do
-    with {:ok, users} <- Repo.get(User, user_id) do
-      {:ok, Repo.preload(users, :authentications)}
+    with user = %User{} <- Repo.get(User, user_id) do
+      {:ok, Repo.preload(user, :authentications)}
     end
   end
 
@@ -76,5 +76,11 @@ defmodule Hammoc.Identity do
         preload: [:associations],
         select: u
     )
+  end
+
+  def update_user(user, params) do
+    user
+    |> User.changeset(params)
+    |> Repo.update()
   end
 end

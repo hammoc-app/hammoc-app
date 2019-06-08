@@ -15,6 +15,7 @@ defmodule Hammoc.Identity.User do
     field :email, Encrypted.Binary
     field :email_hash, Hashed.PBKDF2
     field :newsletter, :boolean
+    field :started, :boolean, null: false, default: false
 
     timestamps()
 
@@ -24,9 +25,9 @@ defmodule Hammoc.Identity.User do
   end
 
   @doc false
-  def changeset(user, attrs) do
+  def changeset(user, attrs \\ %{}) do
     user
-    |> cast(attrs, [:email, :newsletter])
+    |> cast(attrs, [:email, :newsletter, :started])
     |> validate_required([])
     |> put_hashed_fields()
   end

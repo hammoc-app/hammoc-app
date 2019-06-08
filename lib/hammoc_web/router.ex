@@ -19,7 +19,9 @@ defmodule HammocWeb.Router do
 
     get "/", PageController, :index
     get "/sign_in", UserController, :sign_in
+    delete "/sign_out", UserController, :sign_out
     get "/start", UserController, :start
+    put "/update_user", UserController, :update
     get "/account", UserController, :account
   end
 

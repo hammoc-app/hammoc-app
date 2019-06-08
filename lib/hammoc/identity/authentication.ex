@@ -34,10 +34,21 @@ defmodule Hammoc.Identity.Authentication do
   def changeset(authentication, attrs) do
     authentication
     |> cast(attrs, @input_fields)
+    |> cast_image_url(attrs)
     |> validate_required(@required_fields)
     |> put_hashed_fields()
   end
 
+  # allows to pass `image` as alternative key to `image_url`
+  defp cast_image_url(changeset, attrs) do
+    if get_field(changeset, :image_url) do
+      changeset
+    else
+      put_change(changeset, :image_url, attrs[:image] || attrs["image"])
+    end
+  end
+
+  # set `uid_hash` if `uid` changed
   defp put_hashed_fields(changeset) do
     changeset
     |> put_change(:uid_hash, get_field(changeset, :uid))

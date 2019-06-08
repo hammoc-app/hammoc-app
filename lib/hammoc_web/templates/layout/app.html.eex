@@ -18,6 +18,26 @@
             <img src="/images/hammoc.svg" width="247" height="49">
           </div>
         </div>
+        <%= if user = assigns[:user] do %>
+          <div class="navbar-menu">
+            <div class="navbar-end">
+              <div class="navbar-item">
+                <%= if image_url = user_display_image_url(user) do %>
+                  <figure class="image">
+                    <img class="is-rounded" src="<%= image_url %>">
+                  </figure>
+                <% end %>
+                <div style="margin-left: 10px;">
+                  <%= user_display_name(user) %>
+                </div>
+              </div>
+
+              <div class="navbar-item">
+                <%= link("Log out", to: Routes.user_path(@conn, :sign_out), method: :delete, class: "button") %>
+              </div>
+            </div>
+          </div>
+        <% end %>
       </div>
     </nav>
 
