@@ -1,7 +1,7 @@
 <div class="section">
   <div class="columns is-centered">
     <div class="column is-4 is-5-tablet">
-      <%= form_for @changeset, Routes.user_path(@conn, :update), fn f -> %>
+      <%= form_for @changeset, Routes.user_path(@conn, :update), [], fn f -> %>
         <div class="field">
           <label class="label">E-Mail</label>
           <div class="control">

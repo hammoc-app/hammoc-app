@@ -1,8 +1,6 @@
 defmodule HammocWeb.LayoutView do
   use HammocWeb, :view
 
-  alias Hammoc.Identity.User
-
   def user_display_name(user) do
     if auth = user_display_auth(user) do
       auth.name || auth.nickname

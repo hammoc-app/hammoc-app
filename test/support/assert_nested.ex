@@ -1,4 +1,7 @@
 defmodule Test.Support.AssertNested do
+  @moduledoc false
+
+  @doc "Test whether the former data structure is a nested subset of the latter."
   defmacro assert_nested(left, right) do
     quote do
       assert unquote(left) ==
