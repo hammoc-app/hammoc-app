@@ -71,11 +71,13 @@ defmodule Hammoc.MixProject do
 
       # dev & test
       # ==========
+      {:mox, "~> 0.5", only: :test},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
       {:mix_test_watch, "~> 0.9", only: :dev, runtime: false},
       {:faker, "~> 0.12", only: [:dev, :test]},
+      {:phoenix_integration, "~> 0.6", only: :test},
 
       # release & deploy
       # ================
