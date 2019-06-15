@@ -18,34 +18,41 @@ defmodule Test.Support.Stubs.UeberauthStrategy do
   end
 
   def handle_callback!(conn) do
-    conn
-    |> assign(:ueberauth_auth, auth(conn))
+    case Test.Support.Mocks.UeberauthCallback.result() do
+      {:ok, fields} ->
+        auth =
+          conn
+          |> auth()
+          |> set_fields(fields)
+
+        assign(conn, :ueberauth_auth, auth)
+
+      {:error, error = %Ueberauth.Failure.Error{}} ->
+        assign(conn, :ueberauth_failure, %Ueberauth.Failure{
+          errors: [error],
+          provider: strategy_name(conn),
+          strategy: strategy(conn)
+        })
+    end
+  end
+
+  defp set_fields(struct, fields) do
+    Map.merge(struct, Util.Keyword.to_map(fields))
   end
 
   def uid(_conn) do
-    from_mock(:uid) || "abc123"
+    "abc123"
   end
 
   def info(_conn) do
-    from_mock(:info) || %Info{}
+    %Info{}
   end
 
   def credentials(_conn) do
-    from_mock(:credentials) || %Credentials{token: "9yecb129ce", secret: "qn9sbcs19scgb"}
+    %Credentials{token: "9yecb129ce", secret: "qn9sbcs19scgb"}
   end
 
   def extra(_conn) do
-    from_mock(:extra) ||
-      %Extra{
-        raw_info: %{
-          token: "9yecb129ce",
-          user: %{}
-        }
-      }
-  end
-
-  defp from_mock(key) do
-    {:ok, result} = Test.Support.Mocks.UeberauthCallback.result()
-    Keyword.get(result, key)
+    %Extra{raw_info: %{token: "9yecb129ce", user: %{}}}
   end
 end
