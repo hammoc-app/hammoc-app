@@ -1,7 +1,34 @@
-<div class="hero is-primary is-bold">
-  <div class="hero-body">
-    <div class="container">
-      <title>Hi!</title>
+<div class="container">
+  <div class="section">
+    <div class="title">Connected accounts</div>
+
+    <div class="columns">
+      <%= for auth <- assigns.user.authentications do %>
+        <div class="column">
+          <img height="28" width="28" src="/images/platforms/<%= auth.provider %>.svg">
+        </div>
+        <div class="column">
+          <%= auth.provider %>
+        </div>
+        <div class="column">
+          <%= auth.name %>
+        </div>
+        <div class="column">
+          <%= link(to: Routes.user_path(@conn, :remove_authentication, auth), method: :delete) do %>
+            <span class="icon has-text-danger">
+              <i class="mdi mdi-minus-circle-outline mdi-24px"></i>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="button has-text-weight-bold">
+      <a href="<%= Routes.auth_path(@conn, :request, :twitter) %>">
+        Add another Twitter account
+      </a>
     </div>
   </div>
 </div>

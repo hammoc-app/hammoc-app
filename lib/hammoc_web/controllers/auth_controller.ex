@@ -41,7 +41,12 @@ defmodule HammocWeb.AuthController do
 
     case result do
       {:ok, [user]} ->
-        redirect_to = if user.started, do: "/", else: "/start"
+        redirect_to =
+          cond do
+            conn.assigns[:user] -> "/account"
+            !user.started -> "/start"
+            true -> "/"
+          end
 
         conn
         |> put_session(:user_id, user.id)

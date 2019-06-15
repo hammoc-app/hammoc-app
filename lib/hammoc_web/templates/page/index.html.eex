@@ -99,7 +99,7 @@
         Open up your Hammoc
       </div>
       <div class="button has-text-weight-bold">
-        <a href="/auth/twitter">
+        <a href="<%= Routes.auth_path(@conn, :request, :twitter) %>">
           Sign in with Twitter
         </a>
       </div>

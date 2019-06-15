@@ -83,4 +83,33 @@ defmodule Hammoc.Identity do
     |> User.changeset(params)
     |> Repo.update()
   end
+
+  def remove_user_authentication(user, %Authentication{id: auth_id}) do
+    remove_user_authentication(user, auth_id)
+  end
+
+  def remove_user_authentication(%User{id: user_id}, auth_id) when is_binary(auth_id) do
+    user_auths =
+      from ua in UserAuthentication,
+        where: ua.authentication_id == ^auth_id
+
+    # delete the UserAuthentication
+    {deleted, _} =
+      Repo.delete_all(
+        from ua in user_auths,
+          where: ua.user_id == ^user_id
+      )
+
+    # delete the Authentication, if it has no other UserAuthentications
+    if deleted > 0 do
+      unless Repo.exists?(user_auths) do
+        Repo.delete_all(
+          from a in Authentication,
+            where: a.id == ^auth_id
+        )
+      end
+    end
+
+    :ok
+  end
 end

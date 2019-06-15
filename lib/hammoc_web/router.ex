@@ -23,6 +23,7 @@ defmodule HammocWeb.Router do
     get "/start", UserController, :start
     put "/update_user", UserController, :update
     get "/account", UserController, :account
+    delete "/remove_authentication/:authentication_id", UserController, :remove_authentication
   end
 
   scope "/auth", HammocWeb do

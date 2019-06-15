@@ -36,6 +36,14 @@ defmodule HammocWeb.UserController do
     render(conn, "account.html")
   end
 
+  def remove_authentication(conn, %{"authentication_id" => auth_id}) do
+    case Identity.remove_user_authentication(conn.assigns.user, auth_id) do
+      :ok -> conn
+      {:error, error} -> put_flash(conn, :error, Exception.message(error))
+    end
+    |> redirect(to: "/account")
+  end
+
   defp require_user(conn = %{assigns: %{user: _user}}, _opts), do: conn
 
   defp require_user(conn, _opts) do
