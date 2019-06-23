@@ -18,7 +18,8 @@ defmodule HammocWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    get "/sign_in", UserController, :sign_in
+    get "/choose_user", UserController, :choose_user
+    post "/sign_in", UserController, :sign_in
     delete "/sign_out", UserController, :sign_out
     get "/start", UserController, :start
     put "/update_user", UserController, :update

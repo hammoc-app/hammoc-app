@@ -11,6 +11,47 @@ defmodule Hammoc.IdentityTest do
     %{other_user: other_user, user: user}
   end
 
+  def with_user_authentications(context) do
+    %{other_user: other_user, user: user} = with_users(context)
+
+    auth = create!(Authentication)
+    create!(UserAuthentication, user_id: user.id, authentication_id: auth.id)
+
+    other_auth = create!(Authentication)
+    create!(UserAuthentication, user_id: other_user.id, authentication_id: other_auth.id)
+
+    %{
+      user: %{user | authentications: [auth]},
+      other_user: %{other_user | authentications: [other_auth]}
+    }
+  end
+
+  describe "get & update users" do
+    setup :with_users
+
+    def expected_user_fields(user) do
+      user
+      |> Map.from_struct()
+      |> Map.delete(:email_hash)
+    end
+
+    test "get user", %{user: user} do
+      assert_nested({:ok, expected_user_fields(user)}, Identity.get_user(user.id))
+    end
+
+    test "update user", %{user: user} do
+      assert {:ok, _user} = Identity.update_user(user, %{email: "olivia@queer.net"})
+
+      assert_nested({:ok, %{email: "olivia@queer.net"}}, Identity.get_user(user.id))
+    end
+
+    test "get users", %{user: user, other_user: other_user} do
+      users = Identity.get_users([user.id, other_user.id])
+
+      assert_nested({:ok, [expected_user_fields(other_user), expected_user_fields(user)]}, users)
+    end
+  end
+
   describe "authenticate_via_oauth, not signed in" do
     test "returns the same authentication twice" do
       fields = fields_for(Authentication)
@@ -91,6 +132,47 @@ defmodule Hammoc.IdentityTest do
         )
 
       assert_nested(%{id: user.id, email: user.email}, record)
+    end
+  end
+
+  describe "remove user authentication" do
+    setup :with_user_authentications
+
+    test "removes existing authentication from user", %{user: user = %{authentications: [auth]}} do
+      Identity.remove_user_authentication(user, auth)
+
+      assert {:ok, %{authentications: []}} = Identity.get_user(user.id)
+    end
+
+    test "deletes authentication without users", %{user: user = %{authentications: [auth]}} do
+      Identity.remove_user_authentication(user, auth)
+
+      refute Repo.get(Authentication, auth.id)
+    end
+
+    test "keeps authentication for other users", %{
+      user: user = %{authentications: [auth]},
+      other_user: other_user = %{authentications: [other_auth]}
+    } do
+      create!(UserAuthentication, user_id: other_user.id, authentication_id: auth.id)
+
+      Identity.remove_user_authentication(user, auth)
+
+      assert_nested(
+        {:ok, %{authentications: [%{id: other_auth.id}, %{id: auth.id}]}},
+        Identity.get_user(other_user.id)
+      )
+    end
+
+    test "keeps authentication with other users", %{
+      user: user = %{authentications: [auth]},
+      other_user: other_user
+    } do
+      create!(UserAuthentication, user_id: other_user.id, authentication_id: auth.id)
+
+      Identity.remove_user_authentication(user, auth)
+
+      assert Repo.get(Authentication, auth.id)
     end
   end
 end

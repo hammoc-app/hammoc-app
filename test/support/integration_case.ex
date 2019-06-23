@@ -20,6 +20,8 @@ defmodule HammocWeb.IntegrationCase do
       use HammocWeb.ConnCase
       use PhoenixIntegration
 
+      import Test.Support.Factory
+
       import Mox
     end
   end

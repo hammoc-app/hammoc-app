@@ -5,14 +5,40 @@ defmodule HammocWeb.UserAuthenticationTest do
   alias Ueberauth.Auth.Info
   alias Ueberauth.Failure.Error
 
-  describe "Successful login" do
-    setup do
-      stub(UeberauthCallback, :result, fn ->
-        {:ok, info: %Info{name: "Domingo Santini"}}
-      end)
+  alias Hammoc.Identity.{Authentication, User, UserAuthentication}
 
-      :ok
-    end
+  def with_users(_context) do
+    other_user = create!(User, authentications: [])
+    user = create!(User, authentications: [])
+
+    %{other_user: other_user, user: user}
+  end
+
+  def with_user_authentications(context) do
+    %{other_user: other_user, user: user} = with_users(context)
+
+    auth = create!(Authentication, uid: "abc123")
+    create!(UserAuthentication, user_id: user.id, authentication_id: auth.id)
+
+    other_auth = create!(Authentication)
+    create!(UserAuthentication, user_id: other_user.id, authentication_id: other_auth.id)
+
+    %{
+      user: %{user | authentications: [auth]},
+      other_user: %{other_user | authentications: [other_auth]}
+    }
+  end
+
+  def successful_oauth(_context) do
+    stub(UeberauthCallback, :result, fn ->
+      {:ok, info: %Info{name: "Domingo Santini"}}
+    end)
+
+    :ok
+  end
+
+  describe "Successful login" do
+    setup :successful_oauth
 
     test "Login, start, logout, login", %{conn: conn} do
       get(conn, "/")
@@ -39,6 +65,31 @@ defmodule HammocWeb.UserAuthenticationTest do
       |> assert_response(status: 200, path: "/")
       |> refute_response(html: "Domingo Santini")
       |> follow_link("Sign in with Twitter")
+      |> assert_response(status: 200, path: "/start", html: "Domingo Santini")
+    end
+  end
+
+  describe "Authentication with multiple users" do
+    setup :with_user_authentications
+    setup :successful_oauth
+
+    setup %{user: %{authentications: [auth]}, other_user: other_user} do
+      create!(UserAuthentication, user_id: other_user.id, authentication_id: auth.id)
+
+      :ok
+    end
+
+    test "Login, choose user, start", %{conn: conn, user: user, other_user: other_user} do
+      get(conn, "/")
+      |> assert_response(status: 200, path: "/")
+      |> follow_link("Sign in with Twitter")
+      |> assert_response(
+        status: 200,
+        path: "/choose_user",
+        html: user.email,
+        html: other_user.email
+      )
+      |> follow_form(user_id: user.id)
       |> assert_response(status: 200, path: "/start", html: "Domingo Santini")
     end
   end

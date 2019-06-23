@@ -55,7 +55,7 @@ defmodule HammocWeb.AuthController do
       {:ok, users} ->
         conn
         |> put_session(:user_ids, Enum.map(users, & &1.id))
-        |> redirect(to: "/sign_in")
+        |> redirect(to: "/choose_user")
 
       {:error, error} ->
         conn

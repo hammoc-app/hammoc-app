@@ -70,12 +70,15 @@ defmodule Hammoc.Identity do
   end
 
   def get_users(user_ids) do
-    Repo.all(
-      from u in User,
-        where: u.id in ^user_ids,
-        preload: [:associations],
-        select: u
-    )
+    users =
+      Repo.all(
+        from u in User,
+          where: u.id in ^user_ids,
+          preload: [:authentications],
+          select: u
+      )
+
+    {:ok, users}
   end
 
   def update_user(user, params) do

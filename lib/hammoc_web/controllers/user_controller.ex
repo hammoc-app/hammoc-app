@@ -6,10 +6,24 @@ defmodule HammocWeb.UserController do
 
   plug :require_user when action in [:start, :account, :update]
 
-  def sign_in(conn, _params) do
-    users = Identity.get_users(conn.assigns.user_ids)
+  def choose_user(conn, _params) do
+    {:ok, users} = Identity.get_users(get_session(conn, :user_ids))
 
-    render(conn, "sign_in.html", users: users)
+    render(conn, "choose_user.html", users: users)
+  end
+
+  def sign_in(conn, %{"user_id" => user_id}) do
+    with user_id in get_session(conn, :user_ids),
+         {:ok, user} <- Identity.get_user(user_id) do
+      redirect_to = if user.started, do: "/", else: "/start"
+
+      conn
+      |> put_session(:user_id, user.id)
+      |> delete_session(:user_ids)
+      |> redirect(to: redirect_to)
+    else
+      _ -> redirect(conn, "/")
+    end
   end
 
   def sign_out(conn, params) do
