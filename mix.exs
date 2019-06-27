@@ -12,7 +12,7 @@ defmodule Hammoc.MixProject do
       aliases: aliases(),
       deps: deps(),
       dialyzer: [
-        plt_add_apps: [:expug, :ex_unit],
+        plt_add_apps: [:ex_unit],
         flags: [:unmatched_returns, :error_handling, :race_conditions, :no_opaque]
       ],
       test_coverage: [tool: ExCoveralls],
