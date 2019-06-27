@@ -22,7 +22,7 @@ defmodule HammocWeb.UserController do
       |> delete_session(:user_ids)
       |> redirect(to: redirect_to)
     else
-      _ -> redirect(conn, "/")
+      _ -> redirect(conn, to: "/")
     end
   end
 
@@ -51,11 +51,9 @@ defmodule HammocWeb.UserController do
   end
 
   def remove_authentication(conn, %{"authentication_id" => auth_id}) do
-    case Identity.remove_user_authentication(conn.assigns.user, auth_id) do
-      :ok -> conn
-      {:error, error} -> put_flash(conn, :error, Exception.message(error))
-    end
-    |> redirect(to: "/account")
+    Identity.remove_user_authentication(conn.assigns.user, auth_id)
+
+    redirect(conn, to: "/account")
   end
 
   defp require_user(conn = %{assigns: %{user: _user}}, _opts), do: conn
