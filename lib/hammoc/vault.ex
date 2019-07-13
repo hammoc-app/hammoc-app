@@ -2,24 +2,16 @@ defmodule Hammoc.Vault do
   @moduledoc """
   A `Cloak.Vault` to manage encryption.
 
-  Assumes that you have a `HAMMOC_VAULT_KEY` environment variable
-  containing a Base64-encoded key.
-
-  To generate a key:
-  ```
-  $ iex
-  iex> 64 |> :crypto.strong_rand_bytes() |> Base.encode64()
-  ```
+  The encryption key is derived from the `secret_key_base` via key derivation.
   """
 
   use Cloak.Vault, otp_app: :hammoc
 
-  @env_vars ciphers: [
-              default:
-                {[key: %Util.Config.Var{name: "HAMMOC_VAULT_KEY", transform: &Base.decode64!/1}]}
-            ]
+  @key_salt "db encrypted field"
 
-  def init(config) do
-    Util.Config.merge_environment_variables(config, @env_vars)
+  def init(_config) do
+    key = Hammoc.Crypto.key_for(@key_salt, key_length: 32, cache: nil)
+
+    {:ok, ciphers: [default: {Cloak.Ciphers.AES.GCM, tag: <<1>>, key: key}]}
   end
 end
