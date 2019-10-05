@@ -46,3 +46,9 @@ npm-debug.log
 
 # Editor/IDE files
 /.idea/
+
+# macOS Finder files
+.DS_Store
+
+# Elixir Language Server files
+/.elixir_ls/
