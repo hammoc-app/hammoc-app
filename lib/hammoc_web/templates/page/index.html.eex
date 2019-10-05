@@ -99,8 +99,8 @@
         Open up your Hammoc
       </div>
       <div class="button has-text-weight-bold">
-        <a href="https://hammoc.typeform.com/to/Nd5w3R" target="_blank">
-          I'm interested!
+        <a href="<%= Routes.auth_path(@conn, :request, :twitter) %>">
+          Sign in with Twitter
         </a>
       </div>
     </div>

@@ -22,11 +22,15 @@ defmodule Hammoc.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Hammoc.DataCase
+      import Test.Support.Factory
+      import Test.Support.AssertNested
+
+      require Test.Support.AssertNested
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Hammoc.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Hammoc.Repo, ownership_timeout: 600_000)
 
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(Hammoc.Repo, {:shared, self()})

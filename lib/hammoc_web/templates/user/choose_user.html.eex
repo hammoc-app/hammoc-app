@@ -1,0 +1,12 @@
+<div class="container">
+  <div class="section">
+    <%= form_for @conn, Routes.user_path(@conn, :sign_in), [], fn f -> %>
+      <%= for user <- @users do %>
+        <%= radio_button f, :user_id, user.id %>
+        <%= user.email %>
+      <% end %>
+
+      <%= submit "Sign in" %>
+    <% end %>
+  </div>
+</div>

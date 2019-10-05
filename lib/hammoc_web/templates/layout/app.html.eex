@@ -8,6 +8,7 @@
     <meta name="author" content="">
     <title>Hello Hammoc!</title>
     <link href="<%= Routes.static_path(@conn, "/css/app.css") %>" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css">
   </head>
 
   <body>
@@ -15,9 +16,39 @@
       <div class="container">
         <div class="navbar-brand">
           <div class="logo-container">
-            <img src="/images/hammoc.svg" width="247" height="49">
+            <a href="/" title="Home">
+              <img src="/images/hammoc.svg" width="247" height="49">
+            </a>
           </div>
         </div>
+        <%= if user = assigns[:user] do %>
+          <div class="navbar-menu">
+            <div class="navbar-end">
+              <div class="navbar-item">
+                <%= if image_url = user_display_image_url(user) do %>
+                  <figure class="image">
+                    <img class="is-rounded" src="<%= image_url %>">
+                  </figure>
+                <% end %>
+                <div style="margin-left: 10px;">
+                  <%= user_display_name(user) %>
+                </div>
+              </div>
+
+              <div class="navbar-item">
+                <%= link(to: Routes.user_path(@conn, :account), class: "button") do %>
+                  <span class="icon">
+                    <i class="mdi mdi-settings"></i>
+                  </span>
+                <% end %>
+              </div>
+
+              <div class="navbar-item">
+                <%= link("Log out", to: Routes.user_path(@conn, :sign_out), method: :delete, class: "button") %>
+              </div>
+            </div>
+          </div>
+        <% end %>
       </div>
     </nav>
 

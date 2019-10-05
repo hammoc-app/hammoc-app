@@ -14,6 +14,11 @@ defmodule Hammoc.Application do
       access_token_secret: System.get_env("TWITTER_ACCESS_TOKEN_SECRET")
     )
 
+    Application.put_env(:ueberauth, Ueberauth.Strategy.Twitter.OAuth,
+      consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
+      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET")
+    )
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
@@ -21,7 +26,8 @@ defmodule Hammoc.Application do
       # Start the endpoint when the application starts
       HammocWeb.Endpoint,
       # Starts a worker by calling: Hammoc.Worker.start_link(arg)
-      %{id: :systemd, start: {:systemd, :start_link, []}}
+      %{id: :systemd, start: {:systemd, :start_link, []}},
+      Hammoc.Vault
       # {Hammoc.Worker, arg},
       # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
       # Hammoc.Scraper.Twitter.Collector

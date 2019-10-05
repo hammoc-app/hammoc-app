@@ -11,6 +11,8 @@ config :hammoc,
   ecto_repos: [Hammoc.Repo],
   generators: [binary_id: true]
 
+config :hammoc, Hammoc.Repo, migration_primary_key: [type: :binary_id]
+
 # Configures the endpoint
 config :hammoc, HammocWeb.Endpoint,
   url: [host: "localhost"],
@@ -25,6 +27,13 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :hammoc, Hammoc.Ecto.Hashed.PBKDF2,
+  algorithm: :sha256,
+  iterations: 10_000,
+  size: 64
+
+config :ueberauth, Ueberauth, providers: [twitter: {Ueberauth.Strategy.Twitter, []}]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

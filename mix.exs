@@ -54,15 +54,30 @@ defmodule Hammoc.MixProject do
       # ========
       {:extwitter, "~> 0.9"},
 
-      # Utilities for data
-      # ==================
+      # Authentication
+      # ==============
+      {:ueberauth, "~> 0.6"},
+      {:ueberauth_twitter, github: "hammoc-app/ueberauth_twitter"},
+
+      # Data handling
+      # =============
       {:gen_stage, "~> 0.14"},
+      {:cloak_ecto, "~> 1.0.0-alpha.0"},
+      {:pbkdf2, "~> 2.0"},
+
+      # Language extensions
+      # ===================
+      {:typed_struct, "~> 0.1"},
 
       # dev & test
       # ==========
+      {:mox, "~> 0.5", only: :test},
       {:credo, "~> 1.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.10", only: :test, runtime: false},
+      {:mix_test_watch, "~> 0.9", only: :dev, runtime: false},
+      {:faker, "~> 0.12", only: [:dev, :test]},
+      {:phoenix_integration, "~> 0.6", only: :test},
 
       # release & deploy
       # ================

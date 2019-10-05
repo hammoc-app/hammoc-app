@@ -17,3 +17,8 @@ config :hammoc, Hammoc.Repo,
   hostname: "localhost",
   port: "5432",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :ueberauth, Ueberauth, providers: [twitter: {Test.Support.Stubs.UeberauthStrategy, []}]
+
+config :phoenix_integration,
+  endpoint: HammocWeb.Endpoint
