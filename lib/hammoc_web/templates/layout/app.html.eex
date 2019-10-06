@@ -8,7 +8,6 @@
     <meta name="author" content="">
     <title>Hello Hammoc!</title>
     <link href="<%= Routes.static_path(@conn, "/css/app.css") %>" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css">
   </head>
 
   <body>

@@ -51,7 +51,7 @@ config :hammoc, HammocWeb.Endpoint,
     patterns: [
       ~r{priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$},
       ~r{priv/gettext/.*(po)$},
-      ~r{lib/hammoc_web/views/.*(ex)$},
+      ~r{lib/hammoc_web/(live|views)/.*(ex)$},
       ~r{lib/hammoc_web/templates/.*(eex)$}
     ]
   ]

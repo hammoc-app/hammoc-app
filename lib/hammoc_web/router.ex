@@ -4,6 +4,7 @@ defmodule HammocWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
+    plug Phoenix.LiveView.Flash
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
@@ -18,6 +19,7 @@ defmodule HammocWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    live "/dashboard", DashboardLive
     get "/choose_user", UserController, :choose_user
     post "/sign_in", UserController, :sign_in
     delete "/sign_out", UserController, :sign_out

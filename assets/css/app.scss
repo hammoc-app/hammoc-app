@@ -1,7 +1,7 @@
 // This file is for your main application css.
 // Any other file must be imported here.
+@import "material-design-icons-customize";
 @import "bulma-customize";
+@import "../../deps/phoenix_live_view/assets/css/live_view.css";
 
-.logo-container {
-  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
-}
+@import "hammoc-customize";
