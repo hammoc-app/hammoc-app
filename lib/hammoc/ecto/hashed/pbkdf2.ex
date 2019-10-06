@@ -15,4 +15,10 @@ defmodule Hammoc.Ecto.Hashed.PBKDF2 do
 
     {:ok, Keyword.put(config, :secret, key)}
   end
+
+  @impl Ecto.Type
+  def embed_as(_), do: :self
+
+  @impl Ecto.Type
+  def equal?(term1, term2), do: term1 == term2
 end

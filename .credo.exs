@@ -25,6 +25,10 @@
         excluded: [~r"/_build/", ~r"/deps/", ~r"/node_modules/"]
       },
       #
+      # Load and configure plugins here:
+      #
+      plugins: [],
+      #
       # If you create your own checks, you must specify the source files for
       # them here, so they can be loaded by Credo before running the analysis.
       #
@@ -48,13 +52,12 @@
       #     {Credo.Check.Design.DuplicatedCode, false}
       #
       checks: [
-        #
-        ## Refactoring Opportunities
-        #
         # not compatible with Elixir 1.8+
         {Credo.Check.Refactor.MapInto, false},
         # too restrictive
-        {Credo.Check.Refactor.PipeChainStart, false}
+        {Credo.Check.Refactor.WithClauses, false},
+        # not compatible with Elixir 1.8+
+        {Credo.Check.Warning.LazyLogging, false}
       ]
     }
   ]
