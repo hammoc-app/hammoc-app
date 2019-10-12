@@ -2,7 +2,7 @@
 # Use:
 #   docker-compose -f docker-compose.release.yml
 ---
-version: '3'
+version: '3.2'
 
 services:
   hammoc:
