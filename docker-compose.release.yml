@@ -2,15 +2,13 @@
 # Use:
 #   docker-compose -f docker-compose.release.yml
 ---
-version: '3.2'
+version: '3'
 
 services:
   hammoc:
     build:
       dockerfile: Dockerfile.release
       context: .
-      cache_from:
-        - hammoc/hammoc-unstable:latest
     links:
       - postgresql
     ports:
