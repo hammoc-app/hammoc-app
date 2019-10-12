@@ -84,6 +84,7 @@ defmodule Hammoc.MixProject do
       {:mix_test_watch, "~> 0.9", only: :dev, runtime: false},
       {:faker, "~> 0.12", only: [:dev, :test]},
       {:phoenix_integration, "~> 0.6", only: :test},
+      {:floki, "~> 0.23", only: :test},
 
       # release & deploy
       # ================
