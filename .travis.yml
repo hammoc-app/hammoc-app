@@ -67,6 +67,29 @@ jobs:
       cache: false
       install: skip
       script: script/check-elixir-versions
+    
+    - name: Run migrations from Docker release image
+      stage: test
+      env:
+        # see: https://github.com/docker/compose/releases
+        - DOCKER_COMPOSE_VERSION=1.24.1
+      cache: false
+      install: skip
+      before_script:
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+        - sudo rm /usr/local/bin/docker-compose
+        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+        - chmod +x /usr/local/bin/docker-compose
+      script: docker-compose -f docker-compose.release.yml run hammoc migrate
+
+    - name: Generate docs
+      stage: test
+      script:
+        - mix docs
+        - mix coveralls.html
 
     - name: Push new Docker image
       stage: deploy
