@@ -87,6 +87,8 @@ jobs:
 
     - name: Generate docs
       stage: test
+      env:
+        - DB_VERSION=11.1
       script:
         - mix docs
         - mix coveralls.html

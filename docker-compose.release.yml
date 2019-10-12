@@ -9,6 +9,8 @@ services:
     build:
       dockerfile: Dockerfile.release
       context: .
+      cache_from:
+        - hammoc/hammoc-unstable:latest
     links:
       - postgresql
     ports:

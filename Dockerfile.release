@@ -23,7 +23,7 @@ RUN cd assets/ && \
 # Build & extract OTP release
 COPY . .
 RUN mkdir -p /opt/built && \
-    mix release --env=prod --verbose && \
+    mix distillery.release --env=prod --verbose && \
     export RELEASE_PATH=_build/${MIX_ENV}/rel/hammoc/releases && \
     export RELEASE_VERSION=$(cut -d' ' -f2 ${RELEASE_PATH}/start_erl.data) && \
     cp ${RELEASE_PATH}/${RELEASE_VERSION}/hammoc.tar.gz /opt/built/ && \
