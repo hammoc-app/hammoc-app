@@ -14,13 +14,13 @@ before_install:
 env:
   global:
     - DB_PORT=5433
-    - DOCKER_CACHE_FILE=_docker/cache.tar.gz
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
 
 cache:
   directories:
     - _build
     - deps
-    - _docker
+    - /home/travis/docker/
     - doc
     - cover
 
@@ -33,6 +33,34 @@ jobs:
     - name: Static code analysis (test)
       stage: test
       script: MIX_ENV=test mix dialyzer --halt-exit-status
+    
+    - name: Docker release image migrations
+      stage: test
+      language: minimal
+      env:
+        # see: https://github.com/docker/compose/releases
+        - DOCKER_COMPOSE_VERSION=1.24.1
+        - DOCKER_REPO=hammoc/hammoc-unstable
+      install: skip
+      before_script:
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+        - chmod +x docker-compose
+        - sudo mv docker-compose /usr/local/bin
+        - if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi
+        - docker build
+            -f Dockerfile.release
+            --target build-stage
+            --cache-from $DOCKER_REPO:build-stage
+            -t $DOCKER_REPO:build-stage
+            .
+      script:
+        - docker-compose -f docker-compose.release.yml run hammoc migrate
+        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
+        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
 
     - name: Test suite (PostgreSQL 11.1)
       stage: test
@@ -66,40 +94,13 @@ jobs:
       stage: test
       script: mix format --check-formatted --dry-run
 
-    - name: Check Elixir & Erlang versions used
+    - name: Elixir & Erlang versions
       stage: test
       cache: false
       install: skip
       script: script/check-elixir-versions
-    
-    - name: Run migrations from Docker release image
-      stage: test
-      env:
-        # see: https://github.com/docker/compose/releases
-        - DOCKER_COMPOSE_VERSION=1.24.1
-        - DOCKER_REPO=hammoc/hammoc-unstable
-      install: skip
-      before_script:
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        - sudo apt-get update
-        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-        - chmod +x docker-compose
-        - sudo mv docker-compose /usr/local/bin
-        - if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi
-        - docker build
-            -f Dockerfile.release
-            --target build-stage
-            --cache-from $DOCKER_REPO:build-stage
-            -t $DOCKER_REPO:build-stage
-            .
-      script:
-        - docker-compose -f docker-compose.release.yml run hammoc migrate
-        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
-        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
 
-    - name: Generate docs
+    - name: Docs generation
       stage: test
       env:
         - DB_VERSION=11.1
