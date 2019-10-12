@@ -93,6 +93,7 @@ jobs:
         - docker build
             -f Dockerfile.release
             --target build-stage
+            --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:build-stage
             .
       script:
@@ -127,6 +128,7 @@ jobs:
           fi
         - docker build
             -f Dockerfile.release
+            --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:latest
             -t $DOCKER_REPO:$TRAVIS_COMMIT
             -t $DOCKER_REPO:`date +%Y%m%d`
