@@ -13,7 +13,7 @@ module.exports = (env, options) => ({
     ]
   },
   entry: {
-      './js/app.js': ['./js/app.js'].concat(glob.sync('./vendor/**/*.js'))
+    './js/app.js': glob.sync('./vendor/**/*.js').concat(['./js/app.js'])
   },
   output: {
     filename: 'app.js',
@@ -34,7 +34,33 @@ module.exports = (env, options) => ({
       },
       {
         test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true
+            }
+          }
+        ]
+      },
+      // Load fonts
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?(\?.*$|$)/,
+        loader: 'url-loader',
+        options: {
+          outputPath: '../fonts'
+        }
+      },
+      {
+        test: /\.(eot|ttf|otf)?(\?.*$|$)/,
+        loader: 'file-loader',
+        options: {
+          outputPath: '../fonts'
+        }
       }
     ]
   },

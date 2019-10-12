@@ -1,0 +1,43 @@
+<article class="media">
+  <div class="media-content">
+    <div class="content" style="display: flex;">
+      <a class="image is-48x48 margin-right" href="https://twitter.com/<%= @result.user.screen_name %>">
+        <img src="<%= @result.user.profile_image_url %>" class="is-rounded">
+      </a>
+      <a href="https://twitter.com/<%= @result.user.screen_name %>">
+        <div class="title is-5"><%= @result.user.name %></div>
+        <div class="subtitle is-6">@<%= @result.user.screen_name %></div>
+      </a>
+    </div>
+    <div class="content">
+      <%= raw auto_link(@result.text) %>
+    </div>
+    <nav class="level">
+      <div class="level-left">
+        <a class="level-item has-text-grey" href="https://twitter.com/intent/tweet?in_reply_to=<%= @result.id %>">
+          <span class="icon"><i class="mdi mdi-reply"></i></span>
+        </a>
+        <a class="level-item has-text-grey" href="https://twitter.com/intent/retweet?tweet_id=<%= @result.id %>">
+          <span class="icon"><i class="mdi mdi-twitter-retweet"></i></span>
+          <%= @result.retweet_count %>
+        </a>
+        <a class="level-item has-text-grey" href="https://twitter.com/intent/like?tweet_id=<%= @result.id %>">
+          <span class="icon"><i class="mdi mdi-heart"></i></span>
+          <%= @result.favorite_count %>
+        </a>
+      </div>
+      <div class="level-right is-size-7">
+        <%= format_twitter_datetime(@result.created_at) %>
+      </div>
+    </nav>
+    <%= if @result[:quoted_status] do %>
+      <%= render("tweet.html", result: @result.quoted_status) %>
+    <% end %>
+  </div>
+  <div class="media-right">
+    <a class="icon has-text-info" href="https://twitter.com/<%= @result.user.screen_name %>/status/<%= @result.id %>"
+       title="View on Twitter">
+      <i class="mdi mdi-twitter"></i>
+    </a>
+  </div>
+</article>

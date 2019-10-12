@@ -1,0 +1,81 @@
+<div>
+  <span class="image is-32x32 margin-right">
+    <img src="<%= @user.profile_image_url %>" alt="Profile image" class="is-rounded"/>
+  </span>
+  <%= @user.name %>
+</div>
+
+<%= for %{channel: channel, current: current, max: max} <- @retrieval.jobs do %>
+  <progress class="progress is-small" value="<%= current %>" max="<%= max %>" title="<%= channel %>">
+    <%= current %>/<%= max %>
+  </progress>
+<% end %>
+
+<form action="#" class="" phx-change="search" phx-submit="search">
+  <input name="q" type="text" value="<%= @facets.query %>">
+  <input type="submit" value="Search">
+  <%= if @autocomplete do %>
+    <%= for word <- @autocomplete do %>
+      <%= word %>
+      <br />
+    <% end %>
+    <br />
+  <% end %>
+
+  <div class="section" id="hashtags">
+    <%= for hashtag <- @top_hashtags do %>
+      <label class="button is-rounded<%= checked(hashtag, @facets.hashtags, " is-primary") %>">
+        <input name="hashtags[<%= hashtag %>]" type="checkbox" value="true"<%= checked(hashtag, @facets.hashtags) %> class="is-hidden">
+        #<%= hashtag %>
+      </label>
+    <% end %>
+  </div>
+
+  <div class="section" id="profiles">
+    <%= for profile <- @top_profiles do %>
+      <label class="button is-rounded<%= checked(profile.screen_name, @facets.profiles, " is-primary") %>">
+        <input name="profiles[<%= profile.screen_name %>]" type="checkbox" value="true"<%= checked(profile.screen_name, @facets.profiles) %> class="is-hidden">
+        <span class="image is-24x24 margin-right">
+          <img src="<%= profile.profile_image_url %>" alt="Profile image" class="is-rounded" />
+        </span>
+        <%= profile.screen_name %>
+      </label>
+    <% end %>
+  </div>
+
+  <ul class="results" id="results">
+    <%= for result <- @paginator.entries do %>
+      <li class="result">
+        <div class="box">
+          <%= render("tweet.html", result: result) %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+
+  <nav class="pagination is-centered">
+    <ul class="pagination-list">
+      <%= for page <- Scrivener.HTML.raw_pagination_links @paginator, distance: 3 do %>
+        <li>
+          <%= case page do %>
+            <% {:ellipsis, _label} -> %>
+              <span class="pagination-ellipsis">&hellip;</span>
+            <% {label, page} -> %>
+              <%= if page == @paginator.page_number do %>
+                <a class="pagination-link is-current">
+                  <%= label %>
+                </a>
+              <% else %>
+                <% url_params = Hammoc.Search.Facets.to_url_params(%{@facets | page: page}) %>
+                <% path = Routes.live_path(@conn, HammocWeb.DashboardLive, url_params) %>
+                <% rel = Scrivener.HTML.SEO.rel(@paginator, page) %>
+                <a class="pagination-link" data-phx-live-link="push" href="<%= path %>" rel="<%= rel %>">
+                  <%= label %>
+                </a>
+              <% end %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+</form>

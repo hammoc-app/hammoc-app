@@ -5,6 +5,8 @@ defmodule Hammoc.Application do
 
   use Application
 
+  @search Application.get_env(:hammoc, Hammoc.Search)[:module]
+
   def start(_type, _args) do
     # Twitter configuration
     ExTwitter.configure(
@@ -27,7 +29,11 @@ defmodule Hammoc.Application do
       HammocWeb.Endpoint,
       # Starts a worker by calling: Hammoc.Worker.start_link(arg)
       %{id: :systemd, start: {:systemd, :start_link, []}},
-      Hammoc.Vault
+      Hammoc.Vault,
+      # Search module
+      @search,
+      # Retriever module
+      Hammoc.Retriever
       # {Hammoc.Worker, arg},
       # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
       # Hammoc.Scraper.Twitter.Collector

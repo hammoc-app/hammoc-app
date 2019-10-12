@@ -24,6 +24,7 @@ defmodule HammocWeb do
       import Plug.Conn
       import HammocWeb.Gettext
       alias HammocWeb.Router.Helpers, as: Routes
+      import Phoenix.LiveView.Controller, only: [live_render: 3]
     end
   end
 
@@ -41,6 +42,7 @@ defmodule HammocWeb do
 
       import HammocWeb.ErrorHelpers
       import HammocWeb.Gettext
+      import Phoenix.LiveView, only: [live_render: 2, live_render: 3, live_link: 1, live_link: 2]
       alias HammocWeb.Router.Helpers, as: Routes
     end
   end
@@ -50,6 +52,7 @@ defmodule HammocWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
+      import Phoenix.LiveView.Router
     end
   end
 

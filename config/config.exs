@@ -18,7 +18,8 @@ config :hammoc, HammocWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "QsWL9jJw00QsH/6UnZiCXzDgha0JFsoeE6qi43aN967m8lUsM4O5B4U7G6tPTDVy",
   render_errors: [view: HammocWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Hammoc.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Hammoc.PubSub, adapter: Phoenix.PubSub.PG2],
+  live_view: [signing_salt: "8WPwqhvK"]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -27,6 +28,10 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+
+config :hammoc, Hammoc.Search, module: Hammoc.Search.InMemory
+
+config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.Fixtures
 
 config :hammoc, Hammoc.Ecto.Hashed.PBKDF2,
   algorithm: :sha256,

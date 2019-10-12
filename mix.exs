@@ -44,11 +44,17 @@ defmodule Hammoc.MixProject do
       {:phoenix_ecto, "~> 4.0"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
+      {:jason, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"},
+
+      # Frontend
+      # ========
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:gettext, "~> 0.11"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
+      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view"},
+      {:scrivener_list, "~> 2.0"},
+      {:scrivener_html, "~> 1.8"},
 
       # APIs
       # ========
@@ -78,6 +84,7 @@ defmodule Hammoc.MixProject do
       {:mix_test_watch, "~> 0.9", only: :dev, runtime: false},
       {:faker, "~> 0.12", only: [:dev, :test]},
       {:phoenix_integration, "~> 0.6", only: :test},
+      {:floki, "~> 0.23", only: :test},
 
       # release & deploy
       # ================
