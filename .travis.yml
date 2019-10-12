@@ -95,8 +95,8 @@ jobs:
             --target build-stage
             -t $DOCKER_REPO:build-stage
             .
-      script: docker-compose -f docker-compose.release.yml run hammoc migrate
-      after_script:
+      script:
+        - docker-compose -f docker-compose.release.yml run hammoc migrate
         - mkdir -p $(dirname $DOCKER_CACHE_FILE)
         - docker save -o $DOCKER_CACHE_FILE $DOCKER_REPO:build-stage
 
