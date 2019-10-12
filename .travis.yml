@@ -14,11 +14,13 @@ before_install:
 env:
   global:
     - DB_PORT=5433
+    - DOCKER_CACHE_FILE=_docker/cache.tar.gz
 
 cache:
   directories:
     - _build
     - deps
+    - _docker
 
 jobs:
   include:
@@ -73,7 +75,7 @@ jobs:
       env:
         # see: https://github.com/docker/compose/releases
         - DOCKER_COMPOSE_VERSION=1.24.1
-      cache: false
+        - DOCKER_REPO=hammoc/hammoc-unstable
       install: skip
       before_script:
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -83,7 +85,18 @@ jobs:
         - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
         - chmod +x docker-compose
         - sudo mv docker-compose /usr/local/bin
+        - if [ -f $DOCKER_CACHE_FILE ]; then
+            docker load -i $DOCKER_CACHE_FILE;
+          fi
+        - docker build
+            -f Dockerfile.release
+            --target build-stage
+            -t $DOCKER_REPO:build-stage
+            .
       script: docker-compose -f docker-compose.release.yml run hammoc migrate
+      after_script:
+        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
+        - docker save -o $DOCKER_CACHE_FILE $DOCKER_REPO:build-stage
 
     - name: Generate docs
       stage: test
@@ -96,7 +109,6 @@ jobs:
     - name: Push new Docker image
       stage: deploy
       language: minimal
-      cache: false
       env:
         - DOCKER_REPO=hammoc/hammoc-unstable
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
@@ -107,6 +119,9 @@ jobs:
         - sudo apt-get update
         - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+        - if [ -f $DOCKER_CACHE_FILE ]; then
+            docker load -i $DOCKER_CACHE_FILE;
+          fi
         - docker build
             -f Dockerfile.release
             -t $DOCKER_REPO:latest
