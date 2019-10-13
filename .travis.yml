@@ -38,8 +38,6 @@ cache:
     - _build
     - deps
     - /home/travis/docker/
-    - doc
-    - cover
 
 jobs:
   include:
@@ -121,7 +119,6 @@ jobs:
       stage: test
       env:
         - DB_VERSION=11.1
-      before_script: rm -rf doc cover
       script:
         - mix docs
         - mix coveralls.html
@@ -150,7 +147,11 @@ jobs:
 
     - name: Update docs.hammoc.app
       stage: deploy
-      language: minimal
+      env:
+        - DB_VERSION=11.1
+      script:
+        - mix docs
+        - mix coveralls.html
       before_deploy:
         - mv cover/excoveralls.html doc/
         - openssl aes-256-cbc -K $encrypted_d3d7bef984d6_key -iv $encrypted_d3d7bef984d6_iv -in hammocbot_rsa.enc -out hammocbot_rsa -d

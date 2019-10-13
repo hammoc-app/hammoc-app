@@ -18,7 +18,8 @@ defmodule Hammoc.Application do
 
     Application.put_env(:ueberauth, Ueberauth.Strategy.Twitter.OAuth,
       consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
-      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET")
+      consumer_secret: System.get_env("TWITTER_CONSUMER_SECRET"),
+      redirect_uri: System.get_env("TWITTER_REDIRECT_URI")
     )
 
     # List all child processes to be supervised
