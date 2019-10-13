@@ -67,6 +67,8 @@ jobs:
             --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:build-stage
             .
+        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
+        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
         - docker build
             -f Dockerfile.release
             --cache-from $DOCKER_REPO:build-stage
@@ -76,8 +78,6 @@ jobs:
         - docker run --env-file .env.release --network $DOCKER_NETWORK $DOCKER_REPO:latest migrate
         - docker run --env-file .env.release -p $PORT:$PORT --network $DOCKER_NETWORK $DOCKER_REPO:latest &
         - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
-        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
-        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
 
     - name: Test suite (PostgreSQL 11.1)
       stage: test
