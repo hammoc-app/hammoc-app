@@ -2,13 +2,16 @@
 # Use:
 #   docker-compose -f docker-compose.release.yml
 ---
-version: '3'
+version: '3.4'
 
 services:
   hammoc:
     build:
       dockerfile: Dockerfile.release
       context: .
+      # cache_from is used to speed up CI. Remove for local builds.
+      cache_from:
+        - hammoc/hammoc-unstable:build-stage
     links:
       - postgresql
     ports:
