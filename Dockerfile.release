@@ -40,6 +40,7 @@ EXPOSE 8080
 ENV PORT=8080 REPLACE_OS_VARS=true
 
 COPY --from=build-stage /opt/built .
+COPY --from=build-stage /opt/app/priv/fixtures priv/fixtures
 
 USER default
 
