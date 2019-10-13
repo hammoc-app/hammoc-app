@@ -15,7 +15,7 @@ before_install:
       docker network create $DOCKER_NETWORK;
     fi
   - if [[ $DB_VERSION ]]; then
-      docker run -d --name postgres -p $DB_PORT:5432 -e 'POSTGRES_PASSWORD=postgres' --network $DOCKER_NETWORK postgres:$DB_VERSION-alpine;
+      docker run -d --name postgres -p $DB_PORT:5432 --expose 5432 -e 'POSTGRES_PASSWORD=postgres' --network $DOCKER_NETWORK postgres:$DB_VERSION-alpine;
       docker exec -i postgres bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
     fi
 
@@ -50,7 +50,7 @@ jobs:
         - DOCKER=true
         - DB_VERSION=11.1
         - DOCKER_REPO=hammoc/hammoc-unstable
-        - DB_URL=ecto://postgres:postgres@postgres:$DB_PORT/hammoc_prod
+        - DB_URL=ecto://postgres:postgres@postgres:5432/hammoc_prod
       install: skip
       before_script:
         - docker build
