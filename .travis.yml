@@ -59,6 +59,7 @@ jobs:
         - DB_VERSION=11.1
         - DOCKER_REPO=hammoc/hammoc-unstable
         - DB_URL=ecto://postgres:postgres@postgresql:5432/hammoc_prod
+        - PORT=8080
       install: skip
       before_script:
         - docker build
