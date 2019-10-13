@@ -34,7 +34,7 @@ jobs:
       stage: test
       script: MIX_ENV=test mix dialyzer --halt-exit-status
     
-    - name: Docker release image migrations
+    - name: Docker release image
       stage: test
       language: minimal
       env:
