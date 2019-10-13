@@ -12,9 +12,9 @@ before_install:
       sudo apt-get update;
       sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce;
       if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi;
-      docker network create $DOCKER_NETWORK;
     fi
   - if [[ $DB_VERSION ]]; then
+      docker network create $DOCKER_NETWORK;
       docker run -d --name postgres -p $DB_PORT:5432 --expose 5432 -e 'POSTGRES_PASSWORD=postgres' --network $DOCKER_NETWORK postgres:$DB_VERSION-alpine;
       docker exec -i postgres bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
     fi
