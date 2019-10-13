@@ -78,7 +78,11 @@ jobs:
         - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
         - mkdir -p $(dirname $DOCKER_CACHE_FILE)
         - docker history hammoc/hammoc-unstable:build-stage;
+        - du -sh *
+        - du -sh $(dirname $DOCKER_CACHE_FILE)/*
         - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
+        - du -sh *
+        - du -sh $(dirname $DOCKER_CACHE_FILE)/*
 
     - name: Test suite (PostgreSQL 11.1)
       stage: test
