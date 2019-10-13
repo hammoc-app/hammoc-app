@@ -38,18 +38,21 @@ jobs:
       stage: test
       language: minimal
       env:
-        # see: https://github.com/docker/compose/releases
-        - DOCKER_COMPOSE_VERSION=1.24.1
+        - DB_VERSION=11.1
         - DOCKER_REPO=hammoc/hammoc-unstable
+        - PORT=8080
+        - SITE_HOST=localhost
+        - SITE_PORT=8080
+        - SITE_SCHEME=http
+        - SECRET_KEY_BASE=6UnZiCXzDgha0JFsoeE6qi43aN967m8lUsM4O5B4U7G6tPTDVy
+        - DB_URL=ecto://postgres:postgres@localhost/hammoc_prod
+        - ERTS_COOKIE=hSUsngzhvHtR6Llc2VR5y8FC5753XVqX
       install: skip
       before_script:
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
         - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
         - sudo apt-get update
         - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
-        - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-        - chmod +x docker-compose
-        - sudo mv docker-compose /usr/local/bin
         - if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi
         - docker build
             -f Dockerfile.release
@@ -57,10 +60,15 @@ jobs:
             --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:build-stage
             .
+        - docker build
+            -f Dockerfile.release
+            --cache-from $DOCKER_REPO:build-stage
+            -t $DOCKER_REPO:latest
+            .
       script:
-        - docker-compose -f docker-compose.release.yml run hammoc migrate
-        - docker-compose -f docker-compose.release.yml up &
-        - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:8080/ > /dev/null && break; done
+        - docker run $DOCKER_REPO:latest migrate
+        - docker run -p $PORT:$PORT $DOCKER_REPO:latest &
+        - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
         - mkdir -p $(dirname $DOCKER_CACHE_FILE)
         - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
 
