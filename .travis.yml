@@ -6,19 +6,40 @@ addons:
   ssh_known_hosts: docs.hammoc.app
 
 before_install:
+  - if [[ $DOCKER_UPDATE ]]; then
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -;
+      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable";
+      sudo apt-get update;
+      sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce;
+      if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi;
+    fi
   - if [[ $DB_VERSION ]]; then
-      docker run -d --name postgres -p $DB_PORT:5432 -e 'POSTGRES_PASSWORD=postgres' postgres:$DB_VERSION-alpine;
-      docker exec -i postgres bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
+      docker network create $DOCKER_NETWORK;
+      docker run -d
+        --name postgresql
+        --network $DOCKER_NETWORK
+        --expose 5432
+        -p $DB_PORT:5432
+        -e POSTGRES_USER=postgres
+        -e POSTGRES_PASSWORD=postgres
+        -e POSTGRES_DB=hammoc_prod
+        postgres:$DB_VERSION-alpine;
+      docker exec -i postgresql bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
     fi
 
 env:
   global:
     - DB_PORT=5433
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar
+    - DOCKER_NETWORK=hammoc_net
 
 cache:
   directories:
     - _build
     - deps
+    - /home/travis/docker/
+    - doc
+    - cover
 
 jobs:
   include:
@@ -29,6 +50,34 @@ jobs:
     - name: Static code analysis (test)
       stage: test
       script: MIX_ENV=test mix dialyzer --halt-exit-status
+    
+    - name: Docker release image
+      stage: test
+      language: minimal
+      env:
+        - DOCKER_UPDATE=true
+        - DB_VERSION=11.1
+        - DOCKER_REPO=hammoc/hammoc-unstable
+        - PORT=8080
+      install: skip
+      before_script:
+        - docker build
+            -f Dockerfile.release
+            --target build-stage
+            --cache-from $DOCKER_REPO:build-stage
+            -t $DOCKER_REPO:build-stage
+            .
+        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
+        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
+        - docker build
+            -f Dockerfile.release
+            --cache-from $DOCKER_REPO:build-stage
+            -t $DOCKER_REPO:latest
+            .
+      script:
+        - docker run --env-file .env.release --network $DOCKER_NETWORK $DOCKER_REPO:latest migrate
+        - docker run --env-file .env.release -p $PORT:$PORT --network $DOCKER_NETWORK $DOCKER_REPO:latest &
+        - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
 
     - name: Test suite (PostgreSQL 11.1)
       stage: test
@@ -62,28 +111,34 @@ jobs:
       stage: test
       script: mix format --check-formatted --dry-run
 
-    - name: Check Elixir & Erlang versions used
+    - name: Elixir & Erlang versions
       stage: test
       cache: false
       install: skip
       script: script/check-elixir-versions
 
+    - name: Docs generation
+      stage: test
+      env:
+        - DB_VERSION=11.1
+      before_script: rm -rf doc cover
+      script:
+        - mix docs
+        - mix coveralls.html
+
     - name: Push new Docker image
       stage: deploy
       language: minimal
-      cache: false
       env:
+        - DOCKER_UPDATE=true
         - DOCKER_REPO=hammoc/hammoc-unstable
         - secure: Gk7Xc8DwQ1TGOiaCcOsORC/Dlk93bxJbb4i3AqM0Wp3jfaYbjifCV0cGXHqUMJMTCLAYOhyc+dDCjcdJa9BqVzfEGFSg6lfJQLO3/LDCvYVaPShI/69ciVLqTOKHR1cmxLkTn8dd8tuRMDpJsrNNfR3576tJUOJOz/SSs8a+GuBHD+UyqG8jWilUn0ok0T7H3Sk5gWMcaZ8Lqkm0LuU2/tDF7LdmPdPlPBkngp+A8xcR0DhkmLKVAJx1KSfeSGqnwfigTXrIybxRyp8urxMWGOXmviud1duDPqiO+K1QG6OW3q0B5KcPzWbtqrSY8PAGgzl7XVdaLeuWxMSpGZ6T27OUgRJf1x6264fEvHrohSBUfQ1U23GwArrDixVUh4IaZJj601CHyPFesO+4W4eyb1KG0kk33pOqTGVS4w4t+R3m5CuPsnosPb5cmRzBo0DGmd0oMUkMxheg/1M8vc5JqmKo9yYi6h0IsKrESLYdBtcLnTwqVlOqm8QIapNvbxBAgh10iT2y4d9ws/GeN2Qx+/RhW6Fcwq5hJIiePothsrjqmd11DFjaJtR471BUdXNgdwt3ERvlersw5h5ZpQN1AszMqaPWmujBsXn3jcn23ExkW2Y/uDX/SwgYIKsgYbSH3/uBSVhQoIPasIjZweOt3HwPD7aisHI0FlCQRhrYQZo=
         - secure: EsHsn95TUrW7D0bKFwnV4Z9CDlho6pwHgfI2mFOMeq5HIbrw7fleOrYgMEGmh/sd/gmAiuuQyQRhBLLL0hyODXQVkNgDWDPP9fetX3jeXK2fXoBE4ShfxZeYR0MVLn+d90w3rlL9hUl4wiS5ToC+fDLxpwF/oiqsR6zwFVOpXbuZniNol/kImbUyuYf2wrrQWfEdp5BIiYGUdH2cYuiwe3yaNg+hFUDPNGTBNqB7UmmVyY7AIHCa/X85HgkIAZBSQZCAstSf7YubErEa4GylYowDxY3SfxgX0cuA37sAqtiybPjKmNWJoCevVv0KQYKqJZ5bfmVkn8vjlWjNFFWLRTci1SWkWxhZwIx5fO2b8wu0UNrnXskz0P3NVJRN0ZV3rXSckp4+fcwFZopqkSSczKaUWO2ZhbWFGNs91suDh2qo8NtUt60I+mvQmipOAOg9p0QZh9tffX2zfqPcA6I4z7Ca6uhUGOMd5ZEU2UluW53YMTRrSMurMARTKY6BJuyfqBigC27wZdcvYXQFxs7cunCr6lui2pTRA6ck9Tf9w14ZJfaceEk/XE3yij8t1E/H9BHD6pRZMNYjpwTXFUSnjKuumqHSpQOcvVZeDKRZUipNVISLz1GR0AW9mOSK5gwRZ67lDOsyGEztePwfbEiovDlnJ6rqs2PptI6b4TehNvM=
       before_deploy:
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-        - sudo apt-get update
-        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
         - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
         - docker build
             -f Dockerfile.release
+            --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:latest
             -t $DOCKER_REPO:$TRAVIS_COMMIT
             -t $DOCKER_REPO:`date +%Y%m%d`
@@ -95,11 +150,7 @@ jobs:
 
     - name: Update docs.hammoc.app
       stage: deploy
-      env:
-        - DB_VERSION=11.1
-      script:
-        - mix docs
-        - mix coveralls.html
+      language: minimal
       before_deploy:
         - mv cover/excoveralls.html doc/
         - openssl aes-256-cbc -K $encrypted_d3d7bef984d6_key -iv $encrypted_d3d7bef984d6_iv -in hammocbot_rsa.enc -out hammocbot_rsa -d

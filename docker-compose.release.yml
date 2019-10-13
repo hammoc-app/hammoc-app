@@ -13,18 +13,7 @@ services:
       - postgresql
     ports:
       - '8080:8080'
-    environment:
-      PORT: 8080
-      SITE_HOST: hammoc.app
-      SITE_PORT: 443
-      SITE_SCHEME: https
-      SECRET_KEY_BASE: QsWL9jJw00QsH/6UnZiCXzDgha0JFsoeE6qi43aN967m8lUsM4O5B4U7G6tPTDVy
-      DB_URL: ecto://postgres:postgres@postgresql/hammoc_prod
-      TWITTER_CONSUMER_KEY: "${TWITTER_CONSUMER_KEY}"
-      TWITTER_CONSUMER_SECRET: "${TWITTER_CONSUMER_SECRET}"
-      TWITTER_ACCESS_TOKEN: "${TWITTER_ACCESS_TOKEN}"
-      TWITTER_ACCESS_TOKEN_SECRET: "${TWITTER_ACCESS_TOKEN_SECRET}"
-      ERTS_COOKIE: mycookiebringzallboyztotheyarrrd
+    env_file: .env.release
 
   postgresql:
     image: postgres:11.1-alpine
