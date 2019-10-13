@@ -11,7 +11,7 @@ before_install:
       sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable";
       sudo apt-get update;
       sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce;
-      if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi;
+      if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; docker history hammoc/hammoc-unstable:build-stage; fi;
     fi
   - if [[ $DB_VERSION ]]; then
       docker network create $DOCKER_NETWORK;
@@ -77,6 +77,7 @@ jobs:
         - docker run --env-file .env.release -p $PORT:$PORT --network $DOCKER_NETWORK $DOCKER_REPO:latest &
         - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
         - mkdir -p $(dirname $DOCKER_CACHE_FILE)
+        - docker history hammoc/hammoc-unstable:build-stage;
         - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
 
     - name: Test suite (PostgreSQL 11.1)
