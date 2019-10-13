@@ -40,7 +40,7 @@ jobs:
       env:
         - DB_VERSION=11.1
         - DOCKER_REPO=hammoc/hammoc-unstable
-        - DB_URL=ecto://postgres:postgres@localhost/hammoc_prod
+        - DB_URL=ecto://postgres:postgres@localhost:$DB_PORT/hammoc_prod
       install: skip
       before_script:
         - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
