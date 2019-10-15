@@ -36,7 +36,6 @@ env:
 cache:
   directories:
     - _build
-    - deps
     - /home/travis/docker/
 
 jobs:
