@@ -37,34 +37,40 @@ defmodule HammocWeb.UserAuthenticationTest do
     :ok
   end
 
+  def sign_in(conn) do
+    conn
+    |> get("/auth/twitter")
+    |> follow_redirect()
+  end
+
   describe "Successful login" do
     setup :successful_oauth
 
     test "Login, start, logout, login", %{conn: conn} do
       get(conn, "/")
       |> assert_response(status: 200, path: "/")
-      |> follow_link("Sign in with Twitter")
+      |> sign_in()
       |> assert_response(status: 200, path: "/start", html: "Domingo Santini")
       |> follow_form(user: %{email: "user@example.com", newsletter: true})
       |> assert_response(status: 200, path: "/", html: "Domingo Santini")
       |> follow_link("Log out", method: "delete")
       |> assert_response(status: 200, path: "/")
       |> refute_response(html: "Domingo Santini")
-      |> follow_link("Sign in with Twitter")
+      |> sign_in()
       |> assert_response(status: 200, path: "/", html: "Domingo Santini")
     end
 
     test "Login, skip start, logout, login", %{conn: conn} do
       get(conn, "/")
       |> assert_response(status: 200, path: "/")
-      |> follow_link("Sign in with Twitter")
+      |> sign_in()
       |> assert_response(status: 200, path: "/start", html: "Domingo Santini")
       |> follow_link("Not now")
       |> assert_response(status: 200, path: "/", html: "Domingo Santini")
       |> follow_link("Log out", method: "delete")
       |> assert_response(status: 200, path: "/")
       |> refute_response(html: "Domingo Santini")
-      |> follow_link("Sign in with Twitter")
+      |> sign_in()
       |> assert_response(status: 200, path: "/start", html: "Domingo Santini")
     end
   end
@@ -82,7 +88,7 @@ defmodule HammocWeb.UserAuthenticationTest do
     test "Login, choose user, start", %{conn: conn, user: user, other_user: other_user} do
       get(conn, "/")
       |> assert_response(status: 200, path: "/")
-      |> follow_link("Sign in with Twitter")
+      |> sign_in()
       |> assert_response(
         status: 200,
         path: "/choose_user",
@@ -101,7 +107,7 @@ defmodule HammocWeb.UserAuthenticationTest do
 
     get(conn, "/")
     |> assert_response(status: 200, path: "/")
-    |> follow_link("Sign in with Twitter")
+    |> sign_in()
     |> assert_response(status: 200, path: "/")
     |> refute_response(html: "Domingo Santini")
   end
