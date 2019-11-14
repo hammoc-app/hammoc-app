@@ -63,7 +63,7 @@ defmodule Hammoc.MixProject do
       # Authentication
       # ==============
       {:ueberauth, "~> 0.6"},
-      {:ueberauth_twitter, github: "hammoc-app/ueberauth_twitter"},
+      {:ueberauth_twitter, github: "hammoc-app/ueberauth_twitter", branch: "dev"},
 
       # Data handling
       # =============
