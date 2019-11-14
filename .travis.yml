@@ -11,13 +11,15 @@ before_install:
       sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable";
       sudo apt-get update;
       sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce;
-      if [ -f $DOCKER_CACHE_FILE ]; then docker load < $DOCKER_CACHE_FILE; fi;
+    fi
+  - if [[ $DOCKER_COMPOSE_UPDATE ]]; then
+      curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose;
+      chmod +x docker-compose;
+      sudo mv docker-compose /usr/local/bin;
     fi
   - if [[ $DB_VERSION ]]; then
-      docker network create $DOCKER_NETWORK;
       docker run -d
         --name postgresql
-        --network $DOCKER_NETWORK
         --expose 5432
         -p $DB_PORT:5432
         -e POSTGRES_USER=postgres
@@ -30,14 +32,13 @@ before_install:
 env:
   global:
     - DB_PORT=5433
-    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar
-    - DOCKER_NETWORK=hammoc_net
+    # see: https://github.com/docker/compose/releases
+    - DOCKER_COMPOSE_VERSION=1.24.1
 
 cache:
   directories:
     - _build
     - deps
-    - /home/travis/docker/
 
 jobs:
   include:
@@ -52,49 +53,15 @@ jobs:
     - name: Docker release image
       stage: test
       language: minimal
-      env:
-        - DOCKER_UPDATE=true
-        - DB_VERSION=11.1
-        - DOCKER_REPO=hammoc/hammoc-unstable
-        - PORT=8080
-      install: skip
-      before_script:
-        - docker build
-            -f Dockerfile.release
-            --target build-stage
-            --cache-from $DOCKER_REPO:build-stage
-            -t $DOCKER_REPO:build-stage
-            .
-        - mkdir -p $(dirname $DOCKER_CACHE_FILE)
-        - docker save $DOCKER_REPO:build-stage > $DOCKER_CACHE_FILE
-        - docker build
-            -f Dockerfile.release
-            --cache-from $DOCKER_REPO:build-stage
-            -t $DOCKER_REPO:latest
-            .
-      script:
-        - docker run --env-file .env.release --network $DOCKER_NETWORK $DOCKER_REPO:latest migrate
-        - docker run --env-file .env.release -p $PORT:$PORT --network $DOCKER_NETWORK $DOCKER_REPO:latest &
-        - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
-
-    - name: Docker release image (no cache)
-      stage: test
-      language: minimal
       cache: false
       env:
         - DOCKER_UPDATE=true
-        - DB_VERSION=11.1
-        - DOCKER_REPO=hammoc/hammoc-unstable
+        - DOCKER_COMPOSE_UPDATE=true
         - PORT=8080
       install: skip
-      before_script:
-        - docker build
-            -f Dockerfile.release
-            -t $DOCKER_REPO:latest
-            .
       script:
-        - docker run --env-file .env.release --network $DOCKER_NETWORK $DOCKER_REPO:latest migrate
-        - docker run --env-file .env.release -p $PORT:$PORT --network $DOCKER_NETWORK $DOCKER_REPO:latest &
+        - docker-compose -f docker-compose.release.yml run hammoc migrate
+        - docker-compose -f docker-compose.release.yml up &
         - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
 
     - name: Test suite (PostgreSQL 11.1)
@@ -155,7 +122,6 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
         - docker build
             -f Dockerfile.release
-            --cache-from $DOCKER_REPO:build-stage
             -t $DOCKER_REPO:latest
             -t $DOCKER_REPO:$TRAVIS_COMMIT
             -t $DOCKER_REPO:`date +%Y%m%d`
