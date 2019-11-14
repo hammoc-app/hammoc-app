@@ -25,10 +25,8 @@
   </div>
 
   <div class="section">
-    <div class="button has-text-weight-bold">
-      <a href="<%= Routes.auth_path(@conn, :request, :twitter, force_login: true) %>">
-        Add another Twitter account
-      </a>
-    </div>
+    <a class="button has-text-weight-bold" href="<%= Routes.auth_path(@conn, :request, :twitter, force_login: true) %>">
+      Add another Twitter account
+    </a>
   </div>
 </div>

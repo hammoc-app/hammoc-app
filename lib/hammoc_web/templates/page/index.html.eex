@@ -2,10 +2,10 @@
   <div class="hero-body">
     <div class="container">
       <div class="title">
-        Your digital memory
+        Never waste time finding your links again
       </div>
       <div class="subtitle">
-        Everything you bookmarked, liked or shared at one place.
+        Find everything you bookmarked, liked or shared at one place.
       </div>
     </div>
   </div>
@@ -63,9 +63,9 @@
               Open & Secure
             </div>
             <hr>
-            Hammoc is an open-source project with a focus on data privacy.
+            Hammoc is an open source project with a focus on data privacy.
             Everyone can customize, extend and run it on own servers.
-            Hammoc.io is just one instance, professionally hosted in Europe.
+            Don't want to run a server? We run hammoc.app for you, professionally hosted in Europe.
           </div>
         </div>
       </div>
@@ -98,11 +98,9 @@
       <div class="title">
         Open up your Hammoc
       </div>
-      <div class="button has-text-weight-bold">
-        <a href="https://hammoc.typeform.com/to/Nd5w3R" target="_blank">
-          Request invite
-        </a>
-      </div>
+      <a class="button has-text-weight-bold" href="https://hammoc.typeform.com/to/Nd5w3R" target="_blank">
+        Request invite
+      </a>
     </div>
   </div>
 </div>
