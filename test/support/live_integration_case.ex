@@ -17,7 +17,7 @@ defmodule HammocWeb.LiveIntegrationCase do
   use ExUnit.CaseTemplate
 
   using do
-    quote do
+    quote location: :keep do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       alias HammocWeb.Router.Helpers, as: Routes
@@ -43,15 +43,15 @@ defmodule HammocWeb.LiveIntegrationCase do
       end
 
       def next_retrieval(state = %State{extra: %{retrieval_job: retrieval_job}}, batch) do
-        new_retrieval_job = Map.update(retrieval_job, :current, 0, &(&1 + length(batch)))
-        {:ok, {:next_batch, ^retrieval_job}} = @client.send_reply({:ok, batch, new_retrieval_job})
+        {:ok, {:next_batch, ^retrieval_job}} = @client.send_reply({:ok, batch, retrieval_job})
 
+        new_retrieval_job = Map.update(retrieval_job, :current, 0, &(&1 + length(batch)))
         %{state | extra: %{retrieval_job: new_retrieval_job}, html: wait_for_html(state)}
       end
 
       def finish_retrieval(state = %State{extra: %{retrieval_job: retrieval_job}}) do
         new_retrieval_job = Map.put(retrieval_job, :current, retrieval_job.max)
-        {:ok, {:next_batch, ^retrieval_job}} = @client.send_reply({:ok, [], new_retrieval_job})
+        {:ok, {:next_batch, ^new_retrieval_job}} = @client.send_reply({:ok, [], retrieval_job})
 
         %{state | extra: %{retrieval_job: nil}, html: wait_for_html(state)}
       end

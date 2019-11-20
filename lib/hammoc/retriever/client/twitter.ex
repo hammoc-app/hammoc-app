@@ -10,7 +10,12 @@ defmodule Hammoc.Retriever.Client.Twitter do
   def init() do
     # returns a ExTwitter.Model.User
     twitter_user = ExTwitter.user("arnodirlam")
-    retrieval_job = %Job{channel: "Twitter Favorites", current: 0, max: twitter_user.favourites_count}
+
+    retrieval_job = %Job{
+      channel: "Twitter Favorites",
+      current: 0,
+      max: twitter_user.favourites_count
+    }
 
     {:ok, retrieval_job}
   end
@@ -18,7 +23,7 @@ defmodule Hammoc.Retriever.Client.Twitter do
   @impl Client
   def next_batch(job = %Job{extra: %{min_id: min_id}}) do
     # returns a List of ExTwitter.Model.Tweet
-    ExTwitter.favorites(screen_name: "arnodirlam", count: 200, max_id: min_id-1)
+    ExTwitter.favorites(screen_name: "arnodirlam", count: 200, max_id: min_id - 1)
     |> do_next_batch(job)
   end
 
