@@ -32,7 +32,7 @@ config :phoenix, :json_library, Jason
 
 config :hammoc, Hammoc.Search, module: Hammoc.Search.InMemory
 
-config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.Fixtures
+config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.Twitter
 
 config :hammoc, Hammoc.Ecto.Hashed.PBKDF2,
   algorithm: :sha256,

@@ -13,9 +13,10 @@ defmodule Hammoc.Retriever.Status do
     @type t :: %__MODULE__{
             channel: String.t(),
             current: integer(),
-            max: integer()
+            max: integer(),
+            extra: map()
           }
 
-    defstruct [:channel, :current, :max]
+    defstruct [:channel, :current, :max, extra: %{}]
   end
 end

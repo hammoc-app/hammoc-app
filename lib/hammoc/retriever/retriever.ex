@@ -38,6 +38,8 @@ defmodule Hammoc.Retriever do
   def handle_info(:tick, state = %{retrieval_jobs: [retrieval_job]}) do
     {:ok, tweets, new_retrieval_job} = @client.next_batch(retrieval_job)
 
+    new_retrieval_job = Map.update(new_retrieval_job, :current, 0, &(&1 + length(tweets)))
+
     new_retrieval_jobs =
       case tweets do
         [] ->

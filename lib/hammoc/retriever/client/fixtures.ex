@@ -51,8 +51,6 @@ defmodule Hammoc.Retriever.Client.Fixtures do
       state
       |> Map.put(:remaining_tweets, remaining_tweets)
 
-    retrieval_job = Map.update(retrieval_job, :current, 0, &(&1 + 1))
-
     :timer.sleep(1000)
 
     {:reply, {:ok, [loaded_tweet], retrieval_job}, new_state}
