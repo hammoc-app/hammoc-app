@@ -8,6 +8,8 @@ defmodule Hammoc.Application do
   @search Application.get_env(:hammoc, Hammoc.Search)[:module]
 
   def start(_type, _args) do
+    Weaver.load_schema()
+
     # Twitter configuration
     ExTwitter.configure(
       consumer_key: System.get_env("TWITTER_CONSUMER_KEY"),
@@ -34,10 +36,13 @@ defmodule Hammoc.Application do
       # Search module
       @search,
       # Retriever module
-      Hammoc.Retriever
+      Hammoc.Retriever,
       # {Hammoc.Worker, arg},
       # {Hammoc.Scraper.Twitter.Loader, "HillaryClinton"},
-      # Hammoc.Scraper.Twitter.Collector
+      # Hammoc.Scraper.Twitter.Collector,
+      Weaver.Supervisor,
+      Weaver.Graph,
+      {Dlex, name: Dlex, transport: :http, port: 8080}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

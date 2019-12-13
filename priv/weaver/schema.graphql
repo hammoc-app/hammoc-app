@@ -1,0 +1,41 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+}
+
+type Mutation {
+  dummy : Node
+}
+
+type TwitterUser implements Node {
+  id: ID!
+  screenName: String
+  favorites: [Tweet]
+  tweets: [Tweet]
+  retweets: [Tweet]
+}
+
+type Tweet implements Node {
+  id: ID!
+  text: String
+  publishedAt: String
+  likesCount: Int
+  retweetsCount: Int
+  user: TwitterUser
+  likes: [TwitterLike]
+  mentions: [TwitterUser]
+  retweets: [Tweet]
+  replies: [Tweet]
+  retweetOf: Tweet
+}
+
+type TwitterLike {
+  user: TwitterUser
+}
+
+type Mention {
+  user: TwitterUser
+}

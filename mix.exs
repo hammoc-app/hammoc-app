@@ -56,9 +56,12 @@ defmodule Hammoc.MixProject do
       {:scrivener_list, "~> 2.0"},
       {:scrivener_html, "~> 1.8"},
 
-      # APIs
-      # ========
+      # APIs & data transport
+      # =====================
       {:extwitter, "~> 0.9"},
+      {:graphql, github: "shopgun/graphql-erlang"},
+      {:dlex, "~> 0.4"},
+      {:castore, "~> 0.1"},
 
       # Authentication
       # ==============

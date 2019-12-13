@@ -20,6 +20,8 @@ config :hammoc, Hammoc.Repo,
 
 config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.RemoteControlled
 
+config :hammoc, Weaver.Twitter, client_module: Weaver.Twitter.Client.Mock
+
 config :ueberauth, Ueberauth, providers: [twitter: {Test.Support.Stubs.UeberauthStrategy, []}]
 
 config :phoenix_integration,
