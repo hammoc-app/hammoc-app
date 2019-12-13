@@ -70,7 +70,7 @@ defmodule Hammoc.MixProject do
 
       # Data handling
       # =============
-      {:gen_stage, "~> 0.14"},
+      {:gen_stage, github: "hammoc-app/gen_stage", branch: "prosumer", override: true},
       {:cloak_ecto, "~> 1.0.0-alpha.0"},
       {:pbkdf2, "~> 2.0"},
 
