@@ -6,6 +6,13 @@ defmodule Weaver do
     defstruct [:ast, :data, :uid, :fun_env, :operation, :variables, :cursor, count: 0]
   end
 
+  defmodule Ref do
+    @enforce_keys [:id]
+    defstruct @enforce_keys
+
+    def new(id), do: %__MODULE__{id: id}
+  end
+
   def weave(query, operation \\ nil, variables \\ %{}) when is_map(variables) do
     {ast, fun_env} = parse_query(query)
 
