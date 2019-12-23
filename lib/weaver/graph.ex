@@ -5,6 +5,9 @@ defmodule Weaver.Graph do
 
   @timeout :timer.seconds(60)
   @call_timeout :timer.seconds(75)
+  @indexes [
+    "id: string @index(hash,trigram) @upsert ."
+  ]
 
   def start_link(_args) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -92,7 +95,7 @@ defmodule Weaver.Graph do
   def handle_call(:reset, _from, _uids) do
     result =
       with {:ok, _result} <- Dlex.alter(Dlex, %{drop_all: true}),
-           {:ok, _result} <- Dlex.alter(Dlex, "id: string @index(hash,trigram) @upsert .") do
+           {:ok, _result} <- Dlex.alter(Dlex, Enum.join(@indexes, "\n")) do
         :ok
       end
 
@@ -104,7 +107,11 @@ defmodule Weaver.Graph do
 
   ## Examples
 
-      iex> %{"id1" => "a", "id2" => "b", "id3" => "c"}
+      iex> %{
+      ...>   Weaver.Ref.new("id1") => "a",
+      ...>   Weaver.Ref.new("id2") => "b",
+      ...>   Weaver.Ref.new("id3") => "c"
+      ...> }
       ...> |> Weaver.Graph.upsert_query_for()
       "{ a as var(func: eq(id, \"id1\"))
       b as var(func: eq(id, \"id2\"))
@@ -113,7 +120,7 @@ defmodule Weaver.Graph do
   def upsert_query_for(varnames) do
     query_body =
       varnames
-      |> Enum.map(fn {id, var} ->
+      |> Enum.map(fn {%Ref{id: id}, var} ->
         ~s|#{var} as var(func: eq(id, "#{id}"))|
       end)
       |> Enum.join("\n")
@@ -133,13 +140,17 @@ defmodule Weaver.Graph do
       ...>   {Weaver.Ref.new("id3"), :name, "Sia"}
       ...> ]
       ...> |> Weaver.Graph.varnames_for()
-      %{"id1" => "a", "id2" => "b", "id3" => "c"}
+      %{
+        Weaver.Ref.new("id1") => "a",
+        Weaver.Ref.new("id2") => "b",
+        Weaver.Ref.new("id3") => "c"
+      }
   """
   def varnames_for(tuples) do
     tuples
     |> Enum.flat_map(fn
-      {%Ref{id: sub}, _pred, %Ref{id: obj}} -> [sub, obj]
-      {%Ref{id: sub}, _pred, _obj} -> [sub]
+      {sub = %Ref{}, _pred, obj = %Ref{}} -> [sub, obj]
+      {sub = %Ref{}, _pred, _obj} -> [sub]
       _ -> []
     end)
     |> Enum.reduce(%{}, fn id, map ->
@@ -147,8 +158,8 @@ defmodule Weaver.Graph do
     end)
   end
 
-  defp property(%Ref{id: id}, varnames) do
-    with {:ok, var} <- Map.fetch(varnames, id) do
+  defp property(ref = %Ref{}, varnames) do
+    with {:ok, var} <- Map.fetch(varnames, ref) do
       "uid(#{var})"
     end
   end
@@ -164,31 +175,31 @@ defmodule Weaver.Graph do
 
   ## Examples
 
-      iex> Util.String.varname(4)
+      iex> Weaver.Graph.varname(4)
       "aa"
 
-      iex> Util.String.varname(5)
+      iex> Weaver.Graph.varname(5)
       "ab"
 
-      iex> Util.String.varname(6)
+      iex> Weaver.Graph.varname(6)
       "ac"
 
-      iex> Util.String.varname(7)
+      iex> Weaver.Graph.varname(7)
       "ad"
 
-      iex> Util.String.varname(8)
+      iex> Weaver.Graph.varname(8)
       "ba"
 
-      iex> Util.String.varname(19)
+      iex> Weaver.Graph.varname(19)
       "dd"
 
-      iex> Util.String.varname(20)
+      iex> Weaver.Graph.varname(20)
       "aaa"
 
-      iex> Util.String.varname(83)
+      iex> Weaver.Graph.varname(83)
       "ddd"
 
-      iex> Util.String.varname(84)
+      iex> Weaver.Graph.varname(84)
       "aaaa"
   """
   def varname(0), do: "a"
