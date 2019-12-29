@@ -3,7 +3,20 @@ defmodule Weaver do
   alias Weaver.GraphQL.Resolver
 
   defmodule Tree do
-    defstruct [:ast, :data, :uid, :fun_env, :operation, :variables, :cursor, count: 0]
+    defstruct [
+      :ast,
+      :data,
+      :uid,
+      :fun_env,
+      :operation,
+      :variables,
+      :cursor,
+      refresh: true,
+      backfill: true,
+      refreshed: false,
+      gap: :not_loaded,
+      count: 0
+    ]
   end
 
   defmodule Ref do
@@ -11,6 +24,15 @@ defmodule Weaver do
     defstruct @enforce_keys
 
     def new(id), do: %__MODULE__{id: id}
+  end
+
+  defmodule Cursor do
+    @enforce_keys [:ref, :val]
+    defstruct @enforce_keys ++ [:gap]
+
+    def new(ref, val, gap \\ nil) do
+      %__MODULE__{ref: ref, val: val, gap: gap}
+    end
   end
 
   def weave(query, operation \\ nil, variables \\ %{}) when is_map(variables) do

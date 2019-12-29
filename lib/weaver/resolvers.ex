@@ -2,6 +2,8 @@ defmodule Weaver.Resolvers do
   @api_count 200
   @api_take 200
 
+  alias Weaver.{Cursor, Ref}
+
   def retrieve_by_id("TwitterUser:" <> id) do
     ExTwitter.user(id)
   end
@@ -9,12 +11,24 @@ defmodule Weaver.Resolvers do
   def id_for(obj = %ExTwitter.Model.User{}), do: "TwitterUser:#{obj.screen_name}"
   def id_for(obj = %ExTwitter.Model.Tweet{}), do: "Tweet:#{obj.id_str}"
 
-  def resolve_leaf(obj = %ExTwitter.Model.User{}, "id") do
-    obj.id
+  def cursor(objs) when is_list(objs) do
+    objs
+    |> Enum.min_by(& &1.id)
+    |> cursor()
+  end
+
+  def cursor(obj) do
+    id = id_for(obj)
+    ref = Ref.new(id)
+    Cursor.new(ref, obj.id)
   end
 
   def resolve_leaf(obj = %ExTwitter.Model.User{}, "screenName") do
     obj.screen_name
+  end
+
+  def resolve_leaf(obj = %ExTwitter.Model.User{}, "favoritesCount") do
+    obj.favourites_count
   end
 
   def resolve_leaf(obj = %ExTwitter.Model.Tweet{}, "text") do
@@ -103,8 +117,7 @@ defmodule Weaver.Resolvers do
         {:done, []}
 
       tweets ->
-        min_id = Enum.min_by(tweets, & &1.id).id
-        {:continue, Enum.take(tweets, @api_take), min_id}
+        {:continue, Enum.take(tweets, @api_take), cursor(tweets)}
     end
   end
 
@@ -134,8 +147,7 @@ defmodule Weaver.Resolvers do
         {:done, []}
 
       tweets ->
-        min_id = Enum.min_by(tweets, & &1.id).id
-        {:continue, Enum.take(tweets, @api_take), min_id}
+        {:continue, Enum.take(tweets, @api_take), cursor(tweets)}
     end
   end
 
@@ -163,14 +175,12 @@ defmodule Weaver.Resolvers do
         {:done, []}
 
       tweets ->
-        min_id = Enum.min_by(tweets, & &1.id).id
-
         tweets =
           tweets
           |> Enum.filter(& &1.retweeted_status)
           |> Enum.take(@api_take)
 
-        {:continue, tweets, min_id}
+        {:continue, tweets, cursor(tweets)}
     end
   end
 
@@ -197,8 +207,7 @@ defmodule Weaver.Resolvers do
         {:done, []}
 
       tweets ->
-        min_id = Enum.min_by(tweets, & &1.id).id
-        {:continue, Enum.take(tweets, @api_take), min_id}
+        {:continue, Enum.take(tweets, @api_take), cursor(tweets)}
     end
   end
 

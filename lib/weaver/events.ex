@@ -1,5 +1,5 @@
 defmodule Weaver.Events do
-  alias Weaver.{Ref, Resolvers, Tree}
+  alias Weaver.{Cursor, Ref, Resolvers, Tree}
 
   def handle(event) do
     do_handle(event)
@@ -101,6 +101,47 @@ defmodule Weaver.Events do
 
   def do_handle(
         event = %Tree{
+          ast: {:retrieve, opts, _fields, _parent_field},
+          data: parent_obj,
+          gap: :not_loaded
+        },
+        state
+      ) do
+    parent_ref =
+      parent_obj
+      |> Resolvers.id_for()
+      |> Ref.new()
+
+    cond do
+      event.refresh && !event.refreshed ->
+        gap =
+          Weaver.Graph.cursors(parent_ref, opts, 1)
+          |> List.first()
+
+        event = %{event | gap: gap}
+
+        do_handle(event, state)
+
+      event.backfill ->
+        Weaver.Graph.cursors(parent_ref, opts, 3)
+        |> Enum.split_while(&(!&1.gap))
+        |> case do
+          {_refresh_end, [gap_start | rest]} ->
+            event = %{event | cursor: gap_start, gap: List.first(rest)}
+
+            do_handle(event, state)
+
+          _else ->
+            {[], nil}
+        end
+
+      true ->
+        {[], nil}
+    end
+  end
+
+  def do_handle(
+        event = %Tree{
           ast: {:retrieve, opts, fields, parent_field},
           data: parent_obj
         },
@@ -108,21 +149,45 @@ defmodule Weaver.Events do
       ) do
     parent_ref = parent_obj |> Resolvers.id_for() |> Ref.new()
 
-    case Resolvers.retrieve(parent_obj, opts, event.cursor) do
-      {:continue, objs, cursor} ->
-        IO.inspect("next #{length(objs)} #{opts}", label: "RETRIEVED")
-        state = %{event | cursor: cursor, count: event.count + length(objs)}
+    {objs, state} =
+      case Resolvers.retrieve(parent_obj, opts, event.cursor) do
+        {:continue, objs, cursor} ->
+          IO.inspect("next #{length(objs)} #{opts}", label: "RETRIEVED")
 
-        objs = store!(objs, [{parent_ref, parent_field}])
-        continue_with(objs, event, fields, state)
+          case event.gap do
+            %Cursor{ref: %Ref{id: gap_id}} ->
+              case Enum.split_while(objs, &(Resolvers.id_for(&1) != gap_id)) do
+                {objs, []} ->
+                  # gap not closed -> continue with this cursor
+                  state = %{event | cursor: cursor, count: event.count + length(objs)}
+                  {objs, state}
 
-      {:done, objs} ->
-        IO.inspect("last #{length(objs)} #{opts}", label: "RETRIEVED")
-        state = nil
+                {objs, _} ->
+                  # gap closed
+                  state = %{
+                    event
+                    | gap: :not_loaded,
+                      refreshed: true,
+                      count: event.count + length(objs)
+                  }
 
-        objs = store!(objs, [{parent_ref, parent_field}])
-        continue_with(objs, event, fields, state)
-    end
+                  {objs, state}
+              end
+
+            _else ->
+              # no gap -> continue with this cursor
+              state = %{event | cursor: cursor, count: event.count + length(objs)}
+              {objs, state}
+          end
+
+        {:done, objs} ->
+          IO.inspect("last #{length(objs)} #{opts}", label: "RETRIEVED")
+          {objs, nil}
+      end
+
+    store!(objs, [{parent_ref, parent_field}], event.cursor)
+
+    continue_with(objs, event, fields, state)
   end
 
   def do_handle(event, _state) do
@@ -155,12 +220,12 @@ defmodule Weaver.Events do
     |> continue_with(subtree, state)
   end
 
-  defp store!(objs, relations \\ [])
+  defp store!(objs, relations \\ [], old_cursor \\ nil, gap_cursor \\ nil)
 
-  defp store!([], _relations), do: []
+  defp store!([], _relations, _, _), do: []
 
-  defp store!(objs, relations) when is_list(objs) do
-    tuples =
+  defp store!(objs, relations, old_cursor, gap_cursor) when is_list(objs) do
+    [{last_sub, last_pred, last_obj} | tuples] =
       Enum.flat_map(objs, fn obj ->
         id = Resolvers.id_for(obj)
         ref = Ref.new(id)
@@ -172,14 +237,36 @@ defmodule Weaver.Events do
 
         [{ref, :id, id} | relation_tuples]
       end)
+      |> Enum.reverse()
+
+    tuples =
+      if gap_cursor do
+        cursor = Resolvers.cursor(last_obj)
+        [{last_sub, last_pred, last_obj, cursor: cursor.val, gap: true} | tuples]
+      else
+        [{last_sub, last_pred, last_obj} | tuples]
+      end
+      |> Enum.reverse()
+
+    tuples =
+      if old_cursor do
+        relation_tuples =
+          Enum.map(relations, fn {from = %Ref{}, relation} ->
+            {from, relation, old_cursor, []}
+          end)
+
+        relation_tuples ++ tuples
+      else
+        tuples
+      end
 
     Weaver.Graph.store!(tuples)
 
     objs
   end
 
-  defp store!(obj, relations) do
-    [obj] = store!([obj], relations)
+  defp store!(obj, relations, old_cursor, gap_cursor) do
+    [obj] = store!([obj], relations, old_cursor, gap_cursor)
     obj
   end
 end

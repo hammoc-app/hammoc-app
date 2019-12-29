@@ -15,12 +15,14 @@ defmodule WeaverTest do
       ... on TwitterUser {
         id
         screenName
+        favoritesCount
         favorites {
           text
           publishedAt
           user {
             screenName
           }
+          retweetsCount
           retweets {
             text
             publishedAt
