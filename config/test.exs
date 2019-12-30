@@ -20,7 +20,11 @@ config :hammoc, Hammoc.Repo,
 
 config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.RemoteControlled
 
-config :hammoc, Weaver.Twitter, client_module: Weaver.Twitter.Client.Mock
+config :hammoc, Weaver.Twitter,
+  # Weaver.Twitter.Client.Mock
+  client_module: Weaver.ExTwitter.Mock,
+  api_count: 2,
+  api_take: 2
 
 config :ueberauth, Ueberauth, providers: [twitter: {Test.Support.Stubs.UeberauthStrategy, []}]
 

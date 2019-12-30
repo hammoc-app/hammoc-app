@@ -34,7 +34,11 @@ config :hammoc, Hammoc.Search, module: Hammoc.Search.InMemory
 
 config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.Fixtures
 
-config :hammoc, Weaver.Twitter, client_module: Weaver.Twitter.Client.API
+config :hammoc, Weaver.Twitter,
+  # Weaver.Twitter.Client.API
+  client_module: ExTwitter,
+  api_count: 200,
+  api_take: 200
 
 config :hammoc, Hammoc.Ecto.Hashed.PBKDF2,
   algorithm: :sha256,

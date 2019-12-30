@@ -115,7 +115,7 @@ defmodule Weaver.Events do
     cond do
       event.refresh && !event.refreshed ->
         gap =
-          Weaver.Graph.cursors(parent_ref, opts, 1)
+          Weaver.Graph.cursors!(parent_ref, opts, 1)
           |> List.first()
 
         event = %{event | gap: gap}
@@ -123,7 +123,7 @@ defmodule Weaver.Events do
         do_handle(event, state)
 
       event.backfill ->
-        Weaver.Graph.cursors(parent_ref, opts, 3)
+        Weaver.Graph.cursors!(parent_ref, opts, 3)
         |> Enum.split_while(&(!&1.gap))
         |> case do
           {_refresh_end, [gap_start | rest]} ->
@@ -252,7 +252,7 @@ defmodule Weaver.Events do
       if old_cursor do
         relation_tuples =
           Enum.map(relations, fn {from = %Ref{}, relation} ->
-            {from, relation, old_cursor, []}
+            {from, relation, old_cursor.ref, []}
           end)
 
         relation_tuples ++ tuples

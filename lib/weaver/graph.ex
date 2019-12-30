@@ -14,6 +14,22 @@ defmodule Weaver.Graph do
   end
 
   def store(tuples) do
+    Enum.each(tuples, fn
+      {%Ref{}, pred, %Ref{}} when is_binary(pred) or is_atom(pred) ->
+        :ok
+
+      {%Ref{}, pred, %Ref{}, facets}
+      when (is_binary(pred) or is_atom(pred)) and is_list(facets) ->
+        :ok
+
+      {%Ref{}, pred, obj}
+      when (is_binary(pred) or is_atom(pred)) and (is_binary(obj) or is_integer(obj)) ->
+        :ok
+
+      other ->
+        raise ArgumentError, "Invalid tuple:\n" <> inspect(other, pretty: true, limit: :infinity)
+    end)
+
     GenServer.call(__MODULE__, {:store, tuples}, @call_timeout)
   end
 
@@ -26,6 +42,13 @@ defmodule Weaver.Graph do
 
   def cursors(ref, predicate, limit \\ 100) do
     GenServer.call(__MODULE__, {:cursors, ref, predicate, limit}, @call_timeout)
+  end
+
+  def cursors!(ref, predicate, limit \\ 100) do
+    case cursors(ref, predicate, limit) do
+      {:ok, result} -> result
+      {:error, e} -> raise e
+    end
   end
 
   def count(id, relation) do
@@ -68,6 +91,11 @@ defmodule Weaver.Graph do
           obj = property(object, varnames)
           "#{sub} <#{predicate}> #{obj} ."
 
+        {subject, predicate, object, []} ->
+          sub = property(subject, varnames)
+          obj = property(object, varnames)
+          "#{sub} <#{predicate}> #{obj} ."
+
         {subject, predicate, object, facets} ->
           sub = property(subject, varnames)
           obj = property(object, varnames)
@@ -102,7 +130,7 @@ defmodule Weaver.Graph do
     query = ~s"""
     {
       cursors(func: eq(id, #{inspect(ref.id)})) {
-        #{predicate} @facets(cursor, gap, orderdesc: cursor) @cascade {
+        #{predicate} @facets(cursor, gap, orderdesc: cursor) {
           id
         }
       }
@@ -121,7 +149,7 @@ defmodule Weaver.Graph do
                 cursor["#{predicate}|gap"]
               )
             end)
-            |> Enum.sort_by(& &1.cursor)
+            |> Enum.sort_by(& &1.val)
             |> Enum.take(limit)
 
           {:ok, cursors}

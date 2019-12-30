@@ -1,15 +1,17 @@
 defmodule Weaver.Resolvers do
-  @api_count 200
-  @api_take 200
-
   alias Weaver.{Cursor, Ref}
+  alias ExTwitter.Model.{Tweet, User}
+
+  @twitter_client Application.get_env(:hammoc, Weaver.Twitter)[:client_module]
+  @api_count Application.get_env(:hammoc, Weaver.Twitter)[:api_count]
+  @api_take Application.get_env(:hammoc, Weaver.Twitter)[:api_take]
 
   def retrieve_by_id("TwitterUser:" <> id) do
-    ExTwitter.user(id)
+    @twitter_client.user(id)
   end
 
-  def id_for(obj = %ExTwitter.Model.User{}), do: "TwitterUser:#{obj.screen_name}"
-  def id_for(obj = %ExTwitter.Model.Tweet{}), do: "Tweet:#{obj.id_str}"
+  def id_for(obj = %User{}), do: "TwitterUser:#{obj.screen_name}"
+  def id_for(obj = %Tweet{}), do: "Tweet:#{obj.id_str}"
 
   def cursor(objs) when is_list(objs) do
     objs
@@ -23,88 +25,88 @@ defmodule Weaver.Resolvers do
     Cursor.new(ref, obj.id)
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.User{}, "screenName") do
+  def resolve_leaf(obj = %User{}, "screenName") do
     obj.screen_name
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.User{}, "favoritesCount") do
+  def resolve_leaf(obj = %User{}, "favoritesCount") do
     obj.favourites_count
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.Tweet{}, "text") do
+  def resolve_leaf(obj = %Tweet{}, "text") do
     obj.full_text
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.Tweet{}, "publishedAt") do
+  def resolve_leaf(obj = %Tweet{}, "publishedAt") do
     obj.created_at
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.Tweet{}, "likesCount") do
+  def resolve_leaf(obj = %Tweet{}, "likesCount") do
     obj.favorite_count
   end
 
-  def resolve_leaf(obj = %ExTwitter.Model.Tweet{}, "retweetsCount") do
+  def resolve_leaf(obj = %Tweet{}, "retweetsCount") do
     obj.retweet_count
   end
 
-  def resolve_node(obj = %ExTwitter.Model.User{}, "favorites") do
+  def resolve_node(obj = %User{}, "favorites") do
     {:retrieve, obj, :favorites}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.User{}, "tweets") do
+  def resolve_node(obj = %User{}, "tweets") do
     {:retrieve, obj, :tweets}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.User{}, "retweets") do
+  def resolve_node(obj = %User{}, "retweets") do
     {:retrieve, obj, :retweets}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "user") do
+  def resolve_node(obj = %Tweet{}, "user") do
     obj.user
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "retweetOf") do
+  def resolve_node(obj = %Tweet{}, "retweetOf") do
     obj.retweeted_status
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "likes") do
+  def resolve_node(obj = %Tweet{}, "likes") do
     {:retrieve, obj, :likes}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "replies") do
+  def resolve_node(obj = %Tweet{}, "replies") do
     {:retrieve, obj, :replies}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "retweets") do
+  def resolve_node(obj = %Tweet{}, "retweets") do
     {:retrieve, obj, :retweets}
   end
 
-  def resolve_node(obj = %ExTwitter.Model.Tweet{}, "mentions") do
+  def resolve_node(obj = %Tweet{}, "mentions") do
     {:retrieve, obj, :mentions}
   end
 
-  def total_count(obj = %ExTwitter.Model.User{}, "favorites") do
+  def total_count(obj = %User{}, "favorites") do
     obj.favourites_count
   end
 
-  def total_count(obj = %ExTwitter.Model.Tweet{}, "likesCount") do
+  def total_count(obj = %Tweet{}, "likesCount") do
     obj.favorite_count
   end
 
-  def total_count(obj = %ExTwitter.Model.Tweet{}, "retweetsCount") do
+  def total_count(obj = %Tweet{}, "retweetsCount") do
     obj.retweet_count
   end
 
   def total_count(_obj, _relation), do: nil
 
-  def retrieve(obj = %ExTwitter.Model.User{}, :favorites, cursor) do
+  def retrieve(obj = %User{}, :favorites, cursor) do
     tweets =
       case cursor do
         nil ->
-          ExTwitter.favorites(id: obj.id, tweet_mode: :extended, count: @api_count)
+          @twitter_client.favorites(id: obj.id, tweet_mode: :extended, count: @api_count)
 
-        min_id ->
-          ExTwitter.favorites(
+        %Cursor{val: min_id} ->
+          @twitter_client.favorites(
             id: obj.id,
             tweet_mode: :extended,
             count: @api_count,
@@ -121,11 +123,11 @@ defmodule Weaver.Resolvers do
     end
   end
 
-  def retrieve(obj = %ExTwitter.Model.User{}, :tweets, cursor) do
+  def retrieve(obj = %User{}, :tweets, cursor) do
     tweets =
       case cursor do
         nil ->
-          ExTwitter.user_timeline(
+          @twitter_client.user_timeline(
             screen_name: obj.screen_name,
             include_rts: false,
             tweet_mode: :extended,
@@ -133,7 +135,7 @@ defmodule Weaver.Resolvers do
           )
 
         min_id ->
-          ExTwitter.user_timeline(
+          @twitter_client.user_timeline(
             screen_name: obj.screen_name,
             include_rts: false,
             tweet_mode: :extended,
@@ -151,18 +153,18 @@ defmodule Weaver.Resolvers do
     end
   end
 
-  def retrieve(obj = %ExTwitter.Model.User{}, :retweets, cursor) do
+  def retrieve(obj = %User{}, :retweets, cursor) do
     tweets =
       case cursor do
         nil ->
-          ExTwitter.user_timeline(
+          @twitter_client.user_timeline(
             screen_name: obj.screen_name,
             tweet_mode: :extended,
             count: @api_count
           )
 
         min_id ->
-          ExTwitter.user_timeline(
+          @twitter_client.user_timeline(
             screen_name: obj.screen_name,
             tweet_mode: :extended,
             count: @api_count,
@@ -184,22 +186,26 @@ defmodule Weaver.Resolvers do
     end
   end
 
-  def retrieve(%ExTwitter.Model.Tweet{}, :likes, _cursor) do
+  def retrieve(%Tweet{}, :likes, _cursor) do
     {:done, []}
   end
 
-  def retrieve(%ExTwitter.Model.Tweet{}, :replies, _cursor) do
+  def retrieve(%Tweet{}, :replies, _cursor) do
     {:done, []}
   end
 
-  def retrieve(obj = %ExTwitter.Model.Tweet{}, :retweets, cursor) do
+  def retrieve(obj = %Tweet{}, :retweets, cursor) do
     tweets =
       case cursor do
         nil ->
-          ExTwitter.retweets(obj.id, count: @api_count, tweet_mode: :extended)
+          @twitter_client.retweets(obj.id, count: @api_count, tweet_mode: :extended)
 
         min_id ->
-          ExTwitter.retweets(obj.id, count: @api_count, tweet_mode: :extended, max_id: min_id - 1)
+          @twitter_client.retweets(obj.id,
+            count: @api_count,
+            tweet_mode: :extended,
+            max_id: min_id - 1
+          )
       end
 
     case tweets do
@@ -211,11 +217,11 @@ defmodule Weaver.Resolvers do
     end
   end
 
-  def retrieve(obj = %ExTwitter.Model.Tweet{}, :mentions, _cursor) do
+  def retrieve(obj = %Tweet{}, :mentions, _cursor) do
     users =
       case obj.entities.user_mentions do
         [] -> []
-        mentions -> mentions |> Enum.map(& &1.id) |> ExTwitter.user_lookup()
+        mentions -> mentions |> Enum.map(& &1.id) |> @twitter_client.user_lookup()
       end
 
     {:done, users}

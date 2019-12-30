@@ -11,7 +11,13 @@ defimpl Inspect, for: Weaver.Tree do
     concat([
       "#Weaver.Tree",
       to_doc(
-        %{ast: ast ++ ["..."], data: tree.data, cursor: tree.cursor, count: tree.count},
+        %{
+          ast: ast ++ ["..."],
+          data: tree.data,
+          cursor: tree.cursor,
+          count: tree.count,
+          gap: tree.gap
+        },
         opts
       )
     ])
