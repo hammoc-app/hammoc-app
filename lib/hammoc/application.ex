@@ -42,7 +42,7 @@ defmodule Hammoc.Application do
       # Hammoc.Scraper.Twitter.Collector,
       Weaver.Supervisor,
       Weaver.Graph,
-      {Dlex, name: Dlex, transport: :http, port: 8080}
+      {Dlex, [name: Dlex] ++ Application.get_env(:hammoc, :dgraph)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

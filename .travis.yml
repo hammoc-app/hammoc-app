@@ -32,16 +32,15 @@ before_install:
       docker run -d
         --name dgraph
         --expose 9080
-        -p 8080:8080
-        -p $DGRAPH_PORT:9080
+        -p 8081:8080
+        -p 9081:9080
         dgraph/standalone;
-      for _ in {1..20}; do sleep 2 && echo "probing dgraph..." && curl -vf http://localhost:8080/health > /dev/null && break; done;
+      for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:8081/health > /dev/null && break; done;
     fi
 
 env:
   global:
     - DB_PORT=5433
-    - DGRAPH_PORT=9081
     # see: https://github.com/docker/compose/releases
     - DOCKER_COMPOSE_VERSION=1.24.1
 
@@ -72,8 +71,7 @@ jobs:
       script:
         - docker-compose -f docker-compose.release.yml run hammoc migrate
         - docker-compose -f docker-compose.release.yml up &
-        - for _ in {1..20}; do sleep 2 && echo "probing dgraph..." && curl -vf http://localhost:8080/health > /dev/null && break; done
-        - for _ in {1..20}; do sleep 2 && echo "probing postgres..." && curl -vf http://localhost:$PORT/ > /dev/null && break; done
+        - for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:$PORT/ > /dev/null && break; done
 
     - name: Test suite (PostgreSQL 11.1)
       stage: test
