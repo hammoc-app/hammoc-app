@@ -28,10 +28,18 @@ before_install:
         postgres:$DB_VERSION-alpine;
       docker exec -i postgresql bash <<< 'until pg_isready -U postgres > /dev/null 2>&1 ; do sleep 1; done';
     fi
+  - if [[ $DGRAPH ]]; then
+      docker run -d
+        --name dgraph
+        --expose 9080
+        -p $DGRAPH_PORT:9080
+        dgraph/standalone;
+    fi
 
 env:
   global:
     - DB_PORT=5433
+    - DGRAPH_PORT=9081
     # see: https://github.com/docker/compose/releases
     - DOCKER_COMPOSE_VERSION=1.24.1
 
@@ -57,7 +65,7 @@ jobs:
       env:
         - DOCKER_UPDATE=true
         - DOCKER_COMPOSE_UPDATE=true
-        - PORT=8080
+        - PORT=4000
       install: skip
       script:
         - docker-compose -f docker-compose.release.yml run hammoc migrate
@@ -68,24 +76,28 @@ jobs:
       stage: test
       env:
         - DB_VERSION=11.1
+        - DGRAPH=true
       script: mix test
 
     - name: Test suite (PostgreSQL 10)
       stage: test
       env:
         - DB_VERSION=10
+        - DGRAPH=true
       script: mix test
 
     - name: Test suite (PostgreSQL 9)
       stage: test
       env:
         - DB_VERSION=9
+        - DGRAPH=true
       script: mix test
 
     - name: Compiler warnings
       stage: test
       env:
         - DB_VERSION=11.1
+        - DGRAPH=true
       script: mix compile --warnings-as-errors --force && WARNINGS_AS_ERRORS=true mix test
 
     - name: Code conventions
@@ -106,6 +118,7 @@ jobs:
       stage: test
       env:
         - DB_VERSION=11.1
+        - DGRAPH=true
       script:
         - mix docs
         - mix coveralls.html
@@ -135,6 +148,7 @@ jobs:
       stage: deploy
       env:
         - DB_VERSION=11.1
+        - DGRAPH=true
       script:
         - mix docs
         - mix coveralls.html

@@ -12,7 +12,7 @@ services:
     links:
       - postgresql
     ports:
-      - '8080:8080'
+      - '4000:8080'
     env_file: .env.release
 
   postgresql:
@@ -24,3 +24,11 @@ services:
       POSTGRES_DB: hammoc_prod
     ports:
       - '5432:5432'
+
+  dgraph:
+    image: dgraph/standalone
+    restart: always
+    ports:
+      - '8000:8000'
+      - '8080:8080'
+      - '9080:9080'

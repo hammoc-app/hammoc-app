@@ -9,7 +9,8 @@ use Mix.Config
 
 config :hammoc,
   ecto_repos: [Hammoc.Repo],
-  generators: [binary_id: true]
+  generators: [binary_id: true],
+  dgraph: [port: 9080]
 
 # Not supported by distillery custom commands, such as `migrate`:
 # config :hammoc, Hammoc.Repo, migration_primary_key: [type: :binary_id]

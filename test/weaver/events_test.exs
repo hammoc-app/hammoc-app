@@ -34,7 +34,12 @@ defmodule Weaver.EventsTest do
   }
   """
 
-  setup tags do
+  setup do
+    Weaver.Graph.reset!()
+    :ok
+  end
+
+  setup do
     user = build(ExTwitter.Model.User, screen_name: "elixirdigest")
     favorites = build(ExTwitter.Model.Tweet, 10, fn i -> [id: 11 - i] end) |> IO.inspect()
 

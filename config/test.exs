@@ -18,6 +18,8 @@ config :hammoc, Hammoc.Repo,
   port: "5432",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :hammoc, dgraph: [port: 9081]
+
 config :hammoc, Hammoc.Retriever, client_module: Hammoc.Retriever.Client.RemoteControlled
 
 config :hammoc, Weaver.Twitter,
