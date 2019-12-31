@@ -41,6 +41,7 @@ ENV PORT=8080 REPLACE_OS_VARS=true
 
 COPY --from=build-stage /opt/built .
 COPY --from=build-stage /opt/app/priv/fixtures priv/fixtures
+COPY --from=build-stage /opt/app/priv/weaver priv/weaver
 
 USER default
 
