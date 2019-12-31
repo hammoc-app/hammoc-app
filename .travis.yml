@@ -35,7 +35,7 @@ before_install:
         -p 8080:8080
         -p $DGRAPH_PORT:9080
         dgraph/standalone;
-      for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:8080/health > /dev/null && break; done
+      for _ in {1..20}; do sleep 2 && curl -sSf http://localhost:8080/health > /dev/null && break; done;
     fi
 
 env:
