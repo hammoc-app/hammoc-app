@@ -20,7 +20,7 @@ defmodule Weaver.GenStage.Consumer do
 
   @impl GenStage
   def handle_events(events, _from, state) do
-    handle_remaining(events, state)
+    {[], nil} = handle_remaining(events, state)
     {:noreply, [], state}
   end
 
